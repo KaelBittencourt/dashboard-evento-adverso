@@ -81,7 +81,7 @@ export function DashboardHeader({
           <div className="flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                <span className="text-primary text-lg">⚕</span>
+                <Filter size={18} className="text-primary" />
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-foreground leading-none">
