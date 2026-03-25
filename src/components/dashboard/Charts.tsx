@@ -82,7 +82,7 @@ function ChartCard({
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground tracking-tight">{title}</h3>
         {subtitle && (
-          <p className="text-[11px] text-muted-foreground/70 mt-0.5">{subtitle}</p>
+          <p className="text-[11px] text-foreground/60 mt-0.5">{subtitle}</p>
         )}
       </div>
       {children}

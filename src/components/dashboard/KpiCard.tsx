@@ -7,7 +7,7 @@ interface KpiCardProps {
   subtitle?: string;
   trend?: string | null;
   trendLabel?: string;
-  icon: string;
+  icon: ReactNode;
   variant?: "default" | "primary" | "danger" | "warning" | "success";
   mono?: boolean;
 }
@@ -16,36 +16,26 @@ const variantConfig = {
   default: {
     border: "border-border/60",
     bg: "",
-    iconBg: "bg-muted",
-    iconGlow: "",
     valueColor: "text-foreground",
   },
   primary: {
     border: "border-primary/20",
     bg: "bg-primary/[0.03]",
-    iconBg: "bg-primary/10",
-    iconGlow: "shadow-[0_0_12px_hsl(199_89%_48%/0.15)]",
     valueColor: "text-gradient-primary",
   },
   danger: {
     border: "border-destructive/20",
     bg: "bg-destructive/[0.03]",
-    iconBg: "bg-destructive/10",
-    iconGlow: "shadow-[0_0_12px_hsl(0_72%_55%/0.15)]",
     valueColor: "text-destructive",
   },
   warning: {
     border: "border-severity-moderate/20",
     bg: "bg-severity-moderate/[0.03]",
-    iconBg: "bg-severity-moderate/10",
-    iconGlow: "shadow-[0_0_12px_hsl(25_95%_53%/0.15)]",
     valueColor: "text-severity-moderate",
   },
   success: {
     border: "border-severity-none/20",
     bg: "bg-severity-none/[0.03]",
-    iconBg: "bg-severity-none/10",
-    iconGlow: "shadow-[0_0_12px_hsl(142_71%_45%/0.15)]",
     valueColor: "text-severity-none",
   },
 };
@@ -79,65 +69,66 @@ export function KpiCard({
       {/* Subtle gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="relative z-10 flex flex-col gap-3">
-        {/* Header: Icon + Title */}
-        <div className="flex items-center gap-2.5">
-          <div
-            className={`
-              flex items-center justify-center w-8 h-8 rounded-lg
-              ${config.iconBg} ${config.iconGlow}
-              transition-transform duration-300 group-hover:scale-110
-            `}
-          >
-            <span className="text-sm leading-none">{icon}</span>
-          </div>
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider leading-tight flex-1">
-            {title}
-          </p>
+      <div className="relative z-10 flex items-center gap-4">
+        {/* Left: Icon */}
+        <div
+          className={`
+            flex items-center justify-center shrink-0
+            transition-all duration-300 group-hover:scale-110 group-hover:rotate-3
+          `}
+        >
+          <span className="text-2xl leading-none">{icon}</span>
         </div>
 
-        {/* Value */}
-        <div className="flex items-end justify-between gap-2">
-          <p
-            className={`text-[1.625rem] font-bold leading-none tracking-tight ${mono ? "font-mono" : ""
-              } ${config.valueColor}`}
-          >
-            {value}
+        {/* Right: Info */}
+        <div className="flex flex-col flex-1 min-w-0">
+          <p className="text-[10px] font-medium text-foreground/70 uppercase tracking-widest leading-tight truncate mb-1">
+            {title}
           </p>
 
-          {trendNum !== null && (
-            <div
-              className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full ${isUp
-                  ? "text-destructive bg-destructive/10"
-                  : isDown
+          <div className="flex items-center gap-2 mb-1">
+            <p
+              className={`text-2xl font-bold leading-none tracking-tight truncate ${
+                mono ? "font-mono" : ""
+              } ${config.valueColor}`}
+            >
+              {value}
+            </p>
+
+            {trendNum !== null && (
+              <div
+                className={`flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
+                  isUp
+                    ? "text-destructive bg-destructive/10"
+                    : isDown
                     ? "text-severity-none bg-severity-none/10"
                     : "text-muted-foreground bg-muted"
                 }`}
-            >
-              {isUp ? (
-                <TrendingUp size={11} strokeWidth={2.5} />
-              ) : isDown ? (
-                <TrendingDown size={11} strokeWidth={2.5} />
-              ) : (
-                <Minus size={11} strokeWidth={2.5} />
+              >
+                {isUp ? (
+                  <TrendingUp size={10} strokeWidth={2.5} />
+                ) : isDown ? (
+                  <TrendingDown size={10} strokeWidth={2.5} />
+                ) : (
+                  <Minus size={10} strokeWidth={2.5} />
+                )}
+                <span>
+                  {isUp ? "+" : ""}
+                  {trend}%
+                </span>
+              </div>
+            )}
+          </div>
+
+          {(subtitle || trendLabel) && (
+            <p className="text-[10px] text-foreground/60 leading-tight truncate">
+              {subtitle}
+              {trendLabel && (
+                <span className="text-foreground/50 font-medium"> · {trendLabel}</span>
               )}
-              <span>
-                {isUp ? "+" : ""}
-                {trend}%
-              </span>
-            </div>
+            </p>
           )}
         </div>
-
-        {/* Subtitle / Trend Label */}
-        {(subtitle || trendLabel) && (
-          <p className="text-[11px] text-muted-foreground/80 leading-tight">
-            {subtitle}
-            {trendLabel && (
-              <span className="text-muted-foreground/50"> · {trendLabel}</span>
-            )}
-          </p>
-        )}
       </div>
     </div>
   );

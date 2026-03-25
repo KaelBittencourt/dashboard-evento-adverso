@@ -5,6 +5,18 @@ import { KpiCard, KpiGrid } from "@/components/dashboard/KpiCard";
 import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
 import { EvolutionChart, EventTypeChart, DamageChart, UnidadeBarChart, WeekdayChart, ParetoChart, HeatmapChart } from "@/components/dashboard/Charts";
 import { PerformanceTable } from "@/components/dashboard/PerformanceTable";
+import { 
+  FileText, 
+  CalendarDays, 
+  Activity, 
+  ShieldCheck, 
+  AlertTriangle, 
+  Clock, 
+  Building2, 
+  Repeat, 
+  BarChart2, 
+  Siren 
+} from "lucide-react";
 
 export default function Index() {
   const { events, filteredEvents, loading, error, lastUpdated, filters, setFilters, options, refetch } = useAdverseEvents();
@@ -60,7 +72,7 @@ export default function Index() {
                 <KpiCard
                   title="Total de Eventos"
                   value={kpis.total}
-                  icon="📋"
+                  icon={<FileText className="text-primary" />}
                   variant="primary"
                   mono
                   subtitle={`de ${events.length} no total`}
@@ -68,7 +80,7 @@ export default function Index() {
                 <KpiCard
                   title="Últimos 30 dias"
                   value={kpis.last30}
-                  icon="📅"
+                  icon={<CalendarDays className="text-muted-foreground" />}
                   mono
                   trend={kpis.trend}
                   trendLabel="vs 30d anteriores"
@@ -76,7 +88,7 @@ export default function Index() {
                 <KpiCard
                   title="Com Dano"
                   value={kpis.withDamage}
-                  icon="🩹"
+                  icon={<Activity className="text-severity-moderate" />}
                   variant="warning"
                   mono
                   subtitle={`${kpis.damagePct}% do total`}
@@ -84,7 +96,7 @@ export default function Index() {
                 <KpiCard
                   title="Sem Dano"
                   value={kpis.withoutDamage}
-                  icon="✅"
+                  icon={<ShieldCheck className="text-severity-none" />}
                   variant="success"
                   mono
                   subtitle={`${(100 - parseFloat(kpis.damagePct)).toFixed(1)}% do total`}
@@ -92,7 +104,7 @@ export default function Index() {
                 <KpiCard
                   title="Críticos"
                   value={kpis.critical}
-                  icon="🔴"
+                  icon={<AlertTriangle className="text-destructive" />}
                   variant="danger"
                   mono
                   subtitle={`${kpis.criticalPct}% (Severo/Morte)`}
@@ -100,7 +112,7 @@ export default function Index() {
                 <KpiCard
                   title="T. Médio Resolução"
                   value={kpis.avgResolutionDays === "N/A" ? "N/A" : `${kpis.avgResolutionDays}d`}
-                  icon="⏱️"
+                  icon={<Clock className="text-muted-foreground" />}
                   mono
                   subtitle="dias após registro"
                 />
@@ -112,7 +124,7 @@ export default function Index() {
                   <KpiCard
                     title="Setor Crítico"
                     value={kpis.topUnidade[0].replace("Unidade de ", "").replace("Bloco ", "")}
-                    icon="🏥"
+                    icon={<Building2 className="text-destructive" />}
                     variant="danger"
                     subtitle={`${kpis.topUnidade[1]} eventos`}
                   />
@@ -121,7 +133,7 @@ export default function Index() {
                   <KpiCard
                     title="Evento + Recorrente"
                     value={kpis.topType[0].length > 22 ? kpis.topType[0].slice(0, 20) + "..." : kpis.topType[0]}
-                    icon="⚠️"
+                    icon={<Repeat className="text-severity-moderate" />}
                     variant="warning"
                     subtitle={`${kpis.topType[1]} ocorrências`}
                   />
@@ -129,14 +141,14 @@ export default function Index() {
                 <KpiCard
                   title="Taxa de Eventos c/ Dano"
                   value={`${kpis.damagePct}%`}
-                  icon="📊"
+                  icon={<BarChart2 className="text-muted-foreground" />}
                   mono
                   subtitle="eventos que causaram dano"
                 />
                 <KpiCard
                   title="Taxa Críticos"
                   value={`${kpis.criticalPct}%`}
-                  icon="🚨"
+                  icon={<Siren className={parseFloat(kpis.criticalPct) > 5 ? "text-destructive" : "text-muted-foreground"} />}
                   variant={parseFloat(kpis.criticalPct) > 5 ? "danger" : "default"}
                   mono
                   subtitle="Severo ou Morte"

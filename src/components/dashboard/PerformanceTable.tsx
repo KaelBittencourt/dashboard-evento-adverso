@@ -52,7 +52,7 @@ export function PerformanceTable({ events }: PerformanceTableProps) {
             <h3 className="text-sm font-semibold text-foreground tracking-tight">
               Performance por Setor
             </h3>
-            <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+            <p className="text-[11px] text-foreground/60 mt-0.5">
               Volume, participação e tempo médio
             </p>
           </div>
@@ -70,19 +70,19 @@ export function PerformanceTable({ events }: PerformanceTableProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border/40">
-              <th className="text-left text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider pb-2.5 pl-2 pr-4">
+              <th className="text-left text-[10px] font-semibold text-foreground/60 uppercase tracking-wider pb-2.5 pl-2 pr-4">
                 Setor
               </th>
-              <th className="text-right text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider pb-2.5 px-4">
+              <th className="text-right text-[10px] font-semibold text-foreground/60 uppercase tracking-wider pb-2.5 px-4">
                 Total
               </th>
-              <th className="text-right text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider pb-2.5 px-4">
+              <th className="text-right text-[10px] font-semibold text-foreground/60 uppercase tracking-wider pb-2.5 px-4">
                 % Total
               </th>
-              <th className="text-right text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider pb-2.5 px-4">
+              <th className="text-right text-[10px] font-semibold text-foreground/60 uppercase tracking-wider pb-2.5 px-4">
                 Críticos
               </th>
-              <th className="text-right text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider pb-2.5 pl-4">
+              <th className="text-right text-[10px] font-semibold text-foreground/60 uppercase tracking-wider pb-2.5 pl-4">
                 Resolução
               </th>
             </tr>
