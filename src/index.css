@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark medical theme */
+    --background: 220 20% 8%;
+    --foreground: 210 20% 92%;
+
+    --card: 220 18% 11%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 220 18% 11%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 220 20% 8%;
+
+    --secondary: 220 16% 16%;
+    --secondary-foreground: 210 20% 80%;
+
+    --muted: 220 16% 14%;
+    --muted-foreground: 215 15% 52%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 220 20% 8%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+
+    /* Semantic severity colors */
+    --severity-none: 142 71% 45%;
+    --severity-low: 47 96% 53%;
+    --severity-moderate: 25 95% 53%;
+    --severity-severe: 0 72% 55%;
+    --severity-death: 280 65% 50%;
+
+    /* Chart palette */
+    --chart-1: 199 89% 48%;
+    --chart-2: 172 66% 50%;
+    --chart-3: 47 96% 53%;
+    --chart-4: 25 95% 53%;
+    --chart-5: 0 72% 55%;
+    --chart-6: 280 65% 50%;
+    --chart-7: 142 71% 45%;
+    --chart-8: 328 86% 70%;
+
+    /* Glow effects */
+    --glow-primary: 0 0 20px hsl(199 89% 48% / 0.3);
+    --glow-danger: 0 0 20px hsl(0 72% 55% / 0.3);
+    --glow-success: 0 0 20px hsl(142 71% 45% / 0.3);
+
+    /* Gradients */
+    --gradient-card: linear-gradient(135deg, hsl(220 18% 13%), hsl(220 18% 10%));
+    --gradient-primary: linear-gradient(135deg, hsl(199 89% 48%), hsl(172 66% 50%));
+    --gradient-danger: linear-gradient(135deg, hsl(0 72% 55%), hsl(25 95% 53%));
+    --gradient-header: linear-gradient(180deg, hsl(220 25% 10%) 0%, hsl(220 20% 8%) 100%);
+
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 20% 92%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 16% 16%;
+    --sidebar-accent-foreground: 210 20% 80%;
+    --sidebar-border: 220 14% 18%;
+    --sidebar-ring: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card-glass {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-danger {
+    box-shadow: var(--glow-danger);
+  }
+
+  .glow-success {
+    box-shadow: var(--glow-success);
+  }
+
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .badge-none {
+    background: hsl(var(--severity-none) / 0.15);
+    color: hsl(var(--severity-none));
+    border: 1px solid hsl(var(--severity-none) / 0.3);
+  }
+
+  .badge-leve {
+    background: hsl(var(--severity-low) / 0.15);
+    color: hsl(var(--severity-low));
+    border: 1px solid hsl(var(--severity-low) / 0.3);
+  }
+
+  .badge-moderado {
+    background: hsl(var(--severity-moderate) / 0.15);
+    color: hsl(var(--severity-moderate));
+    border: 1px solid hsl(var(--severity-moderate) / 0.3);
+  }
+
+  .badge-severo {
+    background: hsl(var(--severity-severe) / 0.15);
+    color: hsl(var(--severity-severe));
+    border: 1px solid hsl(var(--severity-severe) / 0.3);
+  }
+
+  .badge-morte {
+    background: hsl(var(--severity-death) / 0.15);
+    color: hsl(var(--severity-death));
+    border: 1px solid hsl(var(--severity-death) / 0.3);
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
