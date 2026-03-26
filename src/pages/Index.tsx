@@ -5,17 +5,18 @@ import { KpiCard, KpiGrid } from "@/components/dashboard/KpiCard";
 import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
 import { EvolutionChart, EventTypeChart, DamageChart, UnidadeBarChart, WeekdayChart, ParetoChart, HeatmapChart } from "@/components/dashboard/Charts";
 import { PerformanceTable } from "@/components/dashboard/PerformanceTable";
-import { 
-  FileText, 
-  CalendarDays, 
-  Activity, 
-  ShieldCheck, 
-  AlertTriangle, 
-  Clock, 
-  Building2, 
-  Repeat, 
-  BarChart2, 
-  Siren 
+import { RawDataTable } from "@/components/dashboard/RawDataTable";
+import {
+  FileText,
+  CalendarDays,
+  Activity,
+  ShieldCheck,
+  AlertTriangle,
+  Clock,
+  Building2,
+  Repeat,
+  BarChart2,
+  Siren
 } from "lucide-react";
 
 export default function Index() {
@@ -181,6 +182,11 @@ export default function Index() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <ParetoChart data={paretoData} />
               <PerformanceTable events={filteredEvents} />
+            </section>
+
+            {/* Planilha de Dados / Tabela Nativa */}
+            <section className="grid grid-cols-1 gap-4 mt-4">
+              <RawDataTable events={filteredEvents} />
             </section>
           </>
         )}
