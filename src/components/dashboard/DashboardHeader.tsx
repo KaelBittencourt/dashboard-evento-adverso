@@ -1,5 +1,5 @@
 import { Filters } from "@/hooks/useAdverseEvents";
-import { RefreshCw, Filter, Calendar } from "lucide-react";
+import { RefreshCw, Filter, Calendar, Plus } from "lucide-react";
 import { useRef } from "react";
 
 interface DashboardHeaderProps {
@@ -78,7 +78,7 @@ export function DashboardHeader({
       {/* Title + Filters */}
       <div className="px-6 py-4 max-w-7xl mx-auto w-full">
         <div className="flex flex-col gap-4">
-          <div className="flex-shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
                 <Filter size={18} className="text-primary" />
@@ -92,6 +92,16 @@ export function DashboardHeader({
                 </p>
               </div>
             </div>
+
+            <a 
+              href="https://docs.google.com/forms/d/e/1FAIpQLSc82dwssQmjmqrnE9ACIBHYX_b1FRqC3JwlVqs6M3TgEuWdig/viewform" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-md text-sm font-medium transition-colors flex-shrink-0"
+            >
+              <Plus size={16} />
+              Registrar Evento
+            </a>
           </div>
 
           <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap w-full mt-3 border-t border-border/40 pt-4">
