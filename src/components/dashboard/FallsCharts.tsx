@@ -951,7 +951,19 @@ export function FallDataTable({ events }: { events: FallEvent[] }) {
                     </p>
                   )}
                 </div>
-
+                <div className="flex flex-col p-3 rounded-lg bg-muted/10 border border-border/40 mt-2">
+                  <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider mb-1.5">Ações Tomadas</span>
+                  <div className="space-y-2.5">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-muted-foreground uppercase font-medium">Profissional Acionado:</span>
+                      <span className="text-[12px] text-foreground/90">{selectedEvent.profissionalAcionado || "Não Informado"}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-muted-foreground uppercase font-medium">Conduta Tomada:</span>
+                      <span className="text-[12px] text-foreground/90">{selectedEvent.condutaTomada || "Não Informado"}</span>
+                    </div>
+                  </div>
+                </div>
                 {selectedEvent.relatoQueda && (
                   <div className="flex flex-col p-3.5 rounded-lg border border-border/40 bg-background/50 mt-1">
                     <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider mb-2 flex items-center gap-1.5">

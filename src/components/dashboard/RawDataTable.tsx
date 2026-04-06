@@ -171,10 +171,23 @@ export function RawDataTable({ events }: RawDataTableProps) {
                       {selectedEvent.danos || "Não Informado"}
                     </span>
                   </div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Risco Pré-listado:</span> {selectedEvent.riscoPrelistado || "N/A"}</div>
                   <div className="text-sm"><span className="font-medium text-muted-foreground">Risco Pré-listado:</span> {selectedEvent.riscoPrelistado || "Não Informado"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Nº Registro/Prontuário:</span> {selectedEvent.registro || "Não Informado"}</div>
                 </div>
               </div>
+
+              {(selectedEvent.transferenciaSETOR || selectedEvent.transferenciaINSTITUICAO || selectedEvent.localTransferencia) && (
+                <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 space-y-3 md:col-span-2">
+                  <h4 className="font-semibold text-sm border-b border-blue-500/20 pb-2 mb-2 text-blue-500">Informações de Transferência</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="text-sm"><span className="font-medium text-muted-foreground">Houve Transferência de Setor?</span> {selectedEvent.transferenciaSETOR || "Não Informado"}</div>
+                    <div className="text-sm"><span className="font-medium text-muted-foreground">Houve Transferência de Instituição?</span> {selectedEvent.transferenciaINSTITUICAO || "Não Informado"}</div>
+                    {selectedEvent.localTransferencia && (
+                        <div className="text-sm md:col-span-2"><span className="font-medium text-muted-foreground">Local da Transferência:</span> {selectedEvent.localTransferencia}</div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20 space-y-3 md:col-span-2">
                 <h4 className="font-semibold text-sm border-b border-destructive/20 pb-2 mb-2">Descrição Completa</h4>
