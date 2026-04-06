@@ -1,6 +1,7 @@
 import { Filters } from "@/hooks/useAdverseEvents";
 import { RefreshCw, Filter, Calendar, Plus } from "lucide-react";
 import { useRef } from "react";
+import { DashboardSwitcher } from "./DashboardSwitcher";
 
 interface DashboardHeaderProps {
   filters: Filters;
@@ -17,10 +18,10 @@ interface DashboardHeaderProps {
 }
 
 const inputClass =
-  "bg-secondary/40 hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors w-full";
+  "bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 w-full placeholder:text-muted-foreground/40";
 
 const selectClass =
-  "bg-secondary/40 hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] rounded-md px-2.5 py-1.5 pr-6 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-colors appearance-none cursor-pointer w-full truncate";
+  "filter-select bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 pr-7 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 appearance-none cursor-pointer w-full truncate";
 
 export function DashboardHeader({
   filters,
@@ -50,7 +51,7 @@ export function DashboardHeader({
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-gradient-header backdrop-blur-sm">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-border/50 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 sm:px-6 md:px-10 lg:px-16 xl:px-[10rem] py-3 border-b border-border/50 w-full gap-3 md:gap-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-severity-none animate-pulse-dot" />
@@ -76,22 +77,10 @@ export function DashboardHeader({
       </div>
 
       {/* Title + Filters */}
-      <div className="px-6 py-4 max-w-7xl mx-auto w-full">
+      <div className="px-4 sm:px-6 md:px-10 lg:px-16 xl:px-[10rem] py-4 w-full">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                <Filter size={18} className="text-primary" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground leading-none">
-                  Dashboard de Eventos Adversos
-                </h1>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Núcleo de Segurança do Paciente
-                </p>
-              </div>
-            </div>
+            <DashboardSwitcher />
 
             <a 
               href="https://docs.google.com/forms/d/e/1FAIpQLSc82dwssQmjmqrnE9ACIBHYX_b1FRqC3JwlVqs6M3TgEuWdig/viewform" 

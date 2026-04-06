@@ -14,29 +14,29 @@ interface KpiCardProps {
 
 const variantConfig = {
   default: {
-    border: "border-border/60",
-    bg: "",
+    accent: "hsl(215, 15%, 52%)",
+    accentMuted: "hsl(215, 15%, 52%, 0.12)",
     valueColor: "text-foreground",
   },
   primary: {
-    border: "border-primary/20",
-    bg: "bg-primary/[0.03]",
-    valueColor: "text-gradient-primary",
+    accent: "hsl(199, 89%, 48%)",
+    accentMuted: "hsl(199, 89%, 48%, 0.12)",
+    valueColor: "text-foreground",
   },
   danger: {
-    border: "border-destructive/20",
-    bg: "bg-destructive/[0.03]",
-    valueColor: "text-destructive",
+    accent: "hsl(0, 72%, 55%)",
+    accentMuted: "hsl(0, 72%, 55%, 0.12)",
+    valueColor: "text-foreground",
   },
   warning: {
-    border: "border-severity-moderate/20",
-    bg: "bg-severity-moderate/[0.03]",
-    valueColor: "text-severity-moderate",
+    accent: "hsl(25, 95%, 53%)",
+    accentMuted: "hsl(25, 95%, 53%, 0.12)",
+    valueColor: "text-foreground",
   },
   success: {
-    border: "border-severity-none/20",
-    bg: "bg-severity-none/[0.03]",
-    valueColor: "text-severity-none",
+    accent: "hsl(142, 71%, 45%)",
+    accentMuted: "hsl(142, 71%, 45%, 0.12)",
+    valueColor: "text-foreground",
   },
 };
 
@@ -56,77 +56,71 @@ export function KpiCard({
   const config = variantConfig[variant];
 
   return (
-    <div
-      className={`
-        group relative overflow-hidden rounded-xl border
-        ${config.border} ${config.bg}
-        bg-gradient-to-br from-card to-card/80
-        p-4 transition-all duration-300
-        hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5
-        hover:-translate-y-0.5
-      `}
-    >
-      {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="group relative h-full flex flex-col justify-between rounded-xl bg-card/60 border border-border/40 overflow-hidden transition-all duration-300 hover:border-border/80 hover:bg-card/80">
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[2px] opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: `linear-gradient(90deg, transparent, ${config.accent}, transparent)` }}
+      />
 
-      <div className="relative z-10 flex items-center gap-4">
-        {/* Left: Icon */}
-        <div
-          className={`
-            flex items-center justify-center shrink-0
-            transition-all duration-300 group-hover:scale-110 group-hover:rotate-3
-          `}
-        >
-          <span className="text-2xl leading-none">{icon}</span>
+      <div className="px-4 py-3.5 flex flex-col flex-1">
+        {/* Header: icon + title */}
+        <div className="flex items-center gap-2 mb-2.5">
+          <div
+            className="flex items-center justify-center w-6 h-6 rounded-md transition-transform duration-300 group-hover:scale-110"
+            style={{ backgroundColor: config.accentMuted }}
+          >
+            <span className="[&>svg]:w-3.5 [&>svg]:h-3.5">{icon}</span>
+          </div>
+          <span className="text-[10.5px] font-semibold text-foreground/80 uppercase tracking-widest truncate">
+            {title}
+          </span>
         </div>
 
-        {/* Right: Info */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-[10px] font-medium text-foreground/70 uppercase tracking-widest leading-tight truncate mb-1">
-            {title}
-          </p>
+        {/* Value row */}
+        <div className="flex items-baseline gap-2">
+          <span
+            className={`text-[1.35rem] font-bold leading-none tracking-tight truncate ${
+              mono ? "font-mono" : ""
+            } ${config.valueColor}`}
+          >
+            {value}
+          </span>
 
-          <div className="flex items-center gap-2 mb-1">
-            <p
-              className={`text-2xl font-bold leading-none tracking-tight truncate ${
-                mono ? "font-mono" : ""
-              } ${config.valueColor}`}
+          {trendNum !== null && (
+            <span
+              className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-[2px] rounded-md shrink-0 ${
+                isUp
+                  ? "text-red-400 bg-red-400/10"
+                  : isDown
+                  ? "text-emerald-400 bg-emerald-400/10"
+                  : "text-muted-foreground bg-muted/50"
+              }`}
             >
-              {value}
-            </p>
+              {isUp ? (
+                <TrendingUp size={9} strokeWidth={2.5} />
+              ) : isDown ? (
+                <TrendingDown size={9} strokeWidth={2.5} />
+              ) : (
+                <Minus size={9} strokeWidth={2.5} />
+              )}
+              {isUp ? "+" : ""}
+              {trend}%
+            </span>
+          )}
+        </div>
 
-            {trendNum !== null && (
-              <div
-                className={`flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
-                  isUp
-                    ? "text-destructive bg-destructive/10"
-                    : isDown
-                    ? "text-severity-none bg-severity-none/10"
-                    : "text-muted-foreground bg-muted"
-                }`}
-              >
-                {isUp ? (
-                  <TrendingUp size={10} strokeWidth={2.5} />
-                ) : isDown ? (
-                  <TrendingDown size={10} strokeWidth={2.5} />
-                ) : (
-                  <Minus size={10} strokeWidth={2.5} />
-                )}
-                <span>
-                  {isUp ? "+" : ""}
-                  {trend}%
-                </span>
-              </div>
-            )}
-          </div>
-
-          {(subtitle || trendLabel) && (
-            <p className="text-[10px] text-foreground/60 leading-tight truncate">
+        {/* Subtitle / Spacer */}
+        <div className="mt-auto pt-1.5">
+          {(subtitle || trendLabel) ? (
+            <p className="text-[10.5px] font-medium text-muted-foreground leading-tight truncate">
               {subtitle}
               {trendLabel && (
-                <span className="text-foreground/50 font-medium"> · {trendLabel}</span>
+                <span className="text-muted-foreground/80"> · {trendLabel}</span>
               )}
             </p>
+          ) : (
+            <div className="h-[12px] w-full" /> /* Preserves spacing for empty subtitle */
           )}
         </div>
       </div>
@@ -140,7 +134,7 @@ interface KpiGridProps {
 
 export function KpiGrid({ children }: KpiGridProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       {children}
     </div>
   );

@@ -42,7 +42,7 @@ export default function Index() {
         loading={loading}
       />
 
-      <main id="dashboard-content" className="flex-1 px-4 md:px-6 xl:px-8 py-5 space-y-5 lg:space-y-6 max-w-7xl w-full mx-auto">
+      <main id="dashboard-content" className="flex-1 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-[10rem] py-5 space-y-5 lg:space-y-6 w-full">
         {/* Loading / Error state */}
         {loading && filteredEvents.length === 0 && (
           <div className="flex items-center justify-center h-48">
@@ -68,92 +68,20 @@ export default function Index() {
         {filteredEvents.length > 0 && (
           <>
             {/* KPI Cards */}
-            <section>
-              <KpiGrid>
-                <KpiCard
-                  title="Total de Eventos"
-                  value={kpis.total}
-                  icon={<FileText className="text-primary" />}
-                  variant="primary"
-                  mono
-                  subtitle={`de ${events.length} no total`}
-                />
-                <KpiCard
-                  title="Últimos 30 dias"
-                  value={kpis.last30}
-                  icon={<CalendarDays className="text-muted-foreground" />}
-                  mono
-                  trend={kpis.trend}
-                  trendLabel="vs 30d anteriores"
-                />
-                <KpiCard
-                  title="Com Dano"
-                  value={kpis.withDamage}
-                  icon={<Activity className="text-severity-moderate" />}
-                  variant="warning"
-                  mono
-                  subtitle={`${kpis.damagePct}% do total`}
-                />
-                <KpiCard
-                  title="Sem Dano"
-                  value={kpis.withoutDamage}
-                  icon={<ShieldCheck className="text-severity-none" />}
-                  variant="success"
-                  mono
-                  subtitle={`${(100 - parseFloat(kpis.damagePct)).toFixed(1)}% do total`}
-                />
-                <KpiCard
-                  title="Críticos"
-                  value={kpis.critical}
-                  icon={<AlertTriangle className="text-destructive" />}
-                  variant="danger"
-                  mono
-                  subtitle={`${kpis.criticalPct}% (Severo/Morte)`}
-                />
-                <KpiCard
-                  title="T. Médio Resolução"
-                  value={kpis.avgResolutionDays === "N/A" ? "N/A" : `${kpis.avgResolutionDays}d`}
-                  icon={<Clock className="text-muted-foreground" />}
-                  mono
-                  subtitle="dias após registro"
-                />
-              </KpiGrid>
+            <section className="space-y-3 overflow-x-auto pb-2">
+              <div className="flex flex-col md:flex-row gap-3 md:min-w-max w-full">
+                <div className="flex-1 min-w-[140px]"><KpiCard title="Total de Eventos" value={kpis.total} icon={<FileText className="text-primary" />} variant="primary" mono /></div>
+                <div className="flex-1 min-w-[140px]"><KpiCard title="Últimos 30 dias" value={kpis.last30} icon={<CalendarDays className="text-muted-foreground" />} mono trend={kpis.trend} trendLabel="vs 30d ant." /></div>
+                <div className="flex-1 min-w-[140px]"><KpiCard title="Com Dano" value={kpis.withDamage} icon={<Activity className="text-severity-moderate" />} variant="warning" mono subtitle={`${kpis.damagePct}% do total`} /></div>
+                <div className="flex-1 min-w-[140px]"><KpiCard title="Sem Dano" value={kpis.withoutDamage} icon={<ShieldCheck className="text-severity-none" />} variant="success" mono subtitle={`${(100 - parseFloat(kpis.damagePct)).toFixed(1)}%`} /></div>
+                <div className="flex-1 min-w-[140px]"><KpiCard title="Críticos" value={kpis.critical} icon={<AlertTriangle className="text-destructive" />} variant="danger" mono subtitle={`${kpis.criticalPct}% (Severo/Morte)`} /></div>
+              </div>
 
-              {/* Advanced KPIs */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                {kpis.topUnidade && (
-                  <KpiCard
-                    title="Setor Crítico"
-                    value={kpis.topUnidade[0].replace("Unidade de ", "").replace("Bloco ", "")}
-                    icon={<Building2 className="text-destructive" />}
-                    variant="danger"
-                    subtitle={`${kpis.topUnidade[1]} eventos`}
-                  />
-                )}
-                {kpis.topType && (
-                  <KpiCard
-                    title="Evento + Recorrente"
-                    value={kpis.topType[0].length > 22 ? kpis.topType[0].slice(0, 20) + "..." : kpis.topType[0]}
-                    icon={<Repeat className="text-severity-moderate" />}
-                    variant="warning"
-                    subtitle={`${kpis.topType[1]} ocorrências`}
-                  />
-                )}
-                <KpiCard
-                  title="Taxa de Eventos c/ Dano"
-                  value={`${kpis.damagePct}%`}
-                  icon={<BarChart2 className="text-muted-foreground" />}
-                  mono
-                  subtitle="eventos que causaram dano"
-                />
-                <KpiCard
-                  title="Taxa Críticos"
-                  value={`${kpis.criticalPct}%`}
-                  icon={<Siren className={parseFloat(kpis.criticalPct) > 5 ? "text-destructive" : "text-muted-foreground"} />}
-                  variant={parseFloat(kpis.criticalPct) > 5 ? "danger" : "default"}
-                  mono
-                  subtitle="Severo ou Morte"
-                />
+              <div className="flex flex-col md:flex-row gap-3 md:min-w-max w-full">
+                {kpis.topUnidade && <div className="flex-1 min-w-[160px]"><KpiCard title="Setor Crítico" value={kpis.topUnidade[0].replace("Unidade de ", "").replace("Bloco ", "")} icon={<Building2 className="text-destructive" />} variant="danger" subtitle={`${kpis.topUnidade[1]} eventos`} /></div>}
+                {kpis.topType && <div className="flex-1 min-w-[160px]"><KpiCard title="Evento + Recorrente" value={kpis.topType[0].length > 22 ? kpis.topType[0].slice(0, 20) + "..." : kpis.topType[0]} icon={<Repeat className="text-severity-moderate" />} variant="warning" subtitle={`${kpis.topType[1]} ocorrências`} /></div>}
+                <div className="flex-1 min-w-[160px]"><KpiCard title="Taxa c/ Dano" value={`${kpis.damagePct}%`} icon={<BarChart2 className="text-muted-foreground" />} mono subtitle="eventos que causaram dano" /></div>
+                <div className="flex-1 min-w-[160px]"><KpiCard title="Taxa Críticos" value={`${kpis.criticalPct}%`} icon={<Siren className={parseFloat(kpis.criticalPct) > 5 ? "text-destructive" : "text-muted-foreground"} />} variant={parseFloat(kpis.criticalPct) > 5 ? "danger" : "default"} mono subtitle="Severo ou Morte" /></div>
               </div>
             </section>
 
@@ -192,7 +120,7 @@ export default function Index() {
         )}
       </main>
 
-      <footer className="border-t border-border px-6 py-3 flex items-center justify-between text-xs text-muted-foreground w-full max-w-7xl mx-auto">
+      <footer className="border-t border-border px-4 sm:px-6 md:px-10 lg:px-16 xl:px-[10rem] py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground w-full gap-2 sm:gap-0 text-center sm:text-left">
         <span>Núcleo de Segurança do Paciente · Dashboard de Eventos Adversos</span>
         <span>Fonte: Google Sheets · {filteredEvents.length} registros</span>
       </footer>
