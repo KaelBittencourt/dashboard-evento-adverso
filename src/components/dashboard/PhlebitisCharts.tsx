@@ -359,7 +359,13 @@ const SINAL_BADGE_COLORS: Record<string, string> = {
 };
 
 export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
-  const display = events.slice(0, 100);
+  // Ordenar flebites pela data de instalação (mais recente primeiro)
+  const sorted = [...events].sort((a, b) => {
+    const timeA = a.dataInstalacao?.getTime() || 0;
+    const timeB = b.dataInstalacao?.getTime() || 0;
+    return timeB - timeA;
+  });
+  const display = sorted.slice(0, 100);
   const [selectedEvent, setSelectedEvent] = useState<PhlebitisEvent | null>(null);
 
   function exportCSV() {
@@ -407,12 +413,12 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
                   onClick={() => setSelectedEvent(e)}
                   className="border-b border-border/20 hover:bg-primary/[0.05] transition-colors cursor-pointer"
                 >
-                  <td className="py-2.5 px-4 text-xs font-mono text-muted-foreground">{e.timestamp?.toLocaleDateString("pt-BR") || "N/A"}</td>
+                  <td className="py-2.5 px-4 text-xs font-mono text-muted-foreground">{e.dataInstalacao?.toLocaleDateString("pt-BR") || "Não Informado"}</td>
                   <td className="py-2.5 px-4 text-xs font-medium text-foreground max-w-[180px] truncate" title={e.nomePaciente}>{e.nomePaciente}</td>
                   <td className="py-2.5 px-4 text-xs text-foreground/80">{e.unidade}</td>
                   <td className="py-2.5 px-4 text-xs text-foreground/80">{e.membroCateter}</td>
                   <td className="py-2.5 px-4 text-center"><span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${e.tipoCateter === "Central" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>{e.tipoCateter}</span></td>
-                  <td className="py-2.5 px-4 text-xs text-muted-foreground max-w-[200px] truncate" title={e.sinaisFlogisticos.join(", ")}>{e.sinaisFlogisticos.join(", ") || "—"}</td>
+                  <td className="py-2.5 px-4 text-xs text-muted-foreground max-w-[200px] truncate" title={e.sinaisFlogisticos.join(", ")}>{e.sinaisFlogisticos.join(", ") || "Não Informado"}</td>
                 </tr>
               ))}
             </tbody>
@@ -436,9 +442,9 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Dados do Paciente</h4>
                 <div className="text-sm"><span className="font-medium text-muted-foreground">Nome:</span> {selectedEvent.nomePaciente || "Não Identificado"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Nascimento:</span> {selectedEvent.dataNascimento || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Setor/Unidade:</span> {selectedEvent.unidade || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno do Registro:</span> {selectedEvent.turno || "N/A"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Nascimento:</span> {selectedEvent.dataNascimento || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Setor/Unidade:</span> {selectedEvent.unidade || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno do Registro:</span> {selectedEvent.turno || "Não Informado"}</div>
               </div>
 
               {/* Dados do Cateter */}
@@ -463,7 +469,7 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
                 </div>
                 <div className="text-sm">
                   <span className="font-medium text-muted-foreground">Data de Instalação:</span>{" "}
-                  {selectedEvent.dataInstalacao ? selectedEvent.dataInstalacao.toLocaleDateString("pt-BR") : "Não informada"}
+                  {selectedEvent.dataInstalacao ? selectedEvent.dataInstalacao.toLocaleDateString("pt-BR") : "Não Informado"}
                 </div>
               </div>
 
@@ -493,7 +499,7 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
               <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20 space-y-3 md:col-span-2">
                 <h4 className="font-semibold text-sm border-b border-destructive/20 pb-2 mb-2">Relato Completo</h4>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-                  {selectedEvent.descricao || "Nenhuma descrição fornecida."}
+                  {selectedEvent.descricao || "Não Informado"}
                 </p>
               </div>
             </div>

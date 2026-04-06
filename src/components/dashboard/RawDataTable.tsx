@@ -80,10 +80,10 @@ export function RawDataTable({ events }: RawDataTableProps) {
                     className="border-b border-border/20 transition-colors duration-150 hover:bg-primary/[0.05] cursor-pointer"
                   >
                     <td className="py-2.5 px-4 text-xs font-mono text-muted-foreground">
-                      {e.dataEvento ? e.dataEvento.toLocaleDateString("pt-BR") : "N/A"}
+                      {e.dataEvento ? e.dataEvento.toLocaleDateString("pt-BR") : "Não Informado"}
                     </td>
                     <td className="py-2.5 px-4 text-xs font-medium text-foreground">
-                      {e.nomePaciente || "Não Identificado"} {e.idade ? `(${e.idade})` : ""}
+                      {e.nomePaciente || "Não Informado"} {e.idade ? `(${e.idade})` : ""}
                     </td>
                     <td className="py-2.5 px-4 text-xs text-foreground/80 max-w-[200px] truncate" title={e.tipoEvento}>
                       {e.tipoEvento}
@@ -103,7 +103,7 @@ export function RawDataTable({ events }: RawDataTableProps) {
                             : "bg-severity-none/10 text-severity-none"
                         }`}
                       >
-                        {e.danos || "N/A"}
+                        {e.danos || "Não Informado"}
                       </span>
                     </td>
                     <td className="py-2.5 px-4 text-xs text-muted-foreground uppercase tracking-wider text-[10px]">
@@ -136,28 +136,28 @@ export function RawDataTable({ events }: RawDataTableProps) {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Dados do Paciente</h4>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Nome:</span> {selectedEvent.nomePaciente || "Não Identificado"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Idade:</span> {selectedEvent.idade || "N/A"} anos</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Sexo:</span> {selectedEvent.sexo || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Nascimento:</span> {selectedEvent.dataNascimento || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Data Internação:</span> {selectedEvent.dataInternacao || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Motivo Internação:</span> {selectedEvent.motivoInternacao || "N/A"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Nome:</span> {selectedEvent.nomePaciente || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Idade:</span> {selectedEvent.idade || "Não Informado"} anos</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Sexo:</span> {selectedEvent.sexo || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Nascimento:</span> {selectedEvent.dataNascimento || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Data Internação:</span> {selectedEvent.dataInternacao || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Motivo Internação:</span> {selectedEvent.motivoInternacao || "Não Informado"}</div>
               </div>
 
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Localização e Envolvimento</h4>
                 <div className="text-sm"><span className="font-medium text-muted-foreground">Unidade:</span> {selectedEvent.unidade || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Leito:</span> {selectedEvent.leito || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Local do Evento:</span> {selectedEvent.localEvento || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno:</span> {selectedEvent.turno || "N/A"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Acompanhante:</span> {selectedEvent.acompanhante || "N/A"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Leito:</span> {selectedEvent.leito || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Local do Evento:</span> {selectedEvent.localEvento || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno:</span> {selectedEvent.turno || "Não Informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Acompanhante:</span> {selectedEvent.acompanhante || "Não Informado"}</div>
               </div>
 
               <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3 md:col-span-2">
                 <h4 className="font-semibold text-sm border-b border-primary/20 pb-2 mb-2 text-primary">Classificação do Evento</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Tipo de Evento:</span> {selectedEvent.tipoEvento || "N/A"}</div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Data do Evento:</span> {selectedEvent.dataEvento ? selectedEvent.dataEvento.toLocaleString('pt-BR') : "N/A"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Tipo de Evento:</span> {selectedEvent.tipoEvento || "Não Informado"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Data do Evento:</span> {selectedEvent.dataEvento ? selectedEvent.dataEvento.toLocaleString('pt-BR') : "Não Informado"}</div>
                   <div className="text-sm"><span className="font-medium text-muted-foreground">Gravidade dos Danos:</span> 
                     <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
                         selectedEvent.danos === "Morte" || selectedEvent.danos === "Severo"
@@ -168,27 +168,28 @@ export function RawDataTable({ events }: RawDataTableProps) {
                           ? "bg-primary/10 text-primary"
                           : "bg-severity-none/10 text-severity-none"
                       }`}>
-                      {selectedEvent.danos || "N/A"}
+                      {selectedEvent.danos || "Não Informado"}
                     </span>
                   </div>
                   <div className="text-sm"><span className="font-medium text-muted-foreground">Risco Pré-listado:</span> {selectedEvent.riscoPrelistado || "N/A"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Risco Pré-listado:</span> {selectedEvent.riscoPrelistado || "Não Informado"}</div>
                 </div>
               </div>
 
               <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20 space-y-3 md:col-span-2">
                 <h4 className="font-semibold text-sm border-b border-destructive/20 pb-2 mb-2">Descrição Completa</h4>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-                  {selectedEvent.descricaoEvento || "Nenhuma descrição detalhada foi fornecida para este evento."}
+                  {selectedEvent.descricaoEvento || "Não Informado"}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3 md:col-span-2">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Avaliação e Condutas</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Nível Sensorial Pré:</span> {selectedEvent.nivelSensorialPre || "N/A"}</div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Nível Sensorial Pós:</span> {selectedEvent.nivelSensorialPos || "N/A"}</div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Comunicado Médico:</span> {selectedEvent.comunicadoMedico || "N/A"}</div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Avaliação no Plantão:</span> {selectedEvent.avaliacaoPlantao || "N/A"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Nível Sensorial Pré:</span> {selectedEvent.nivelSensorialPre || "Não Informado"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Nível Sensorial Pós:</span> {selectedEvent.nivelSensorialPos || "Não Informado"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Comunicado Médico:</span> {selectedEvent.comunicadoMedico || "Não Informado"}</div>
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Avaliação no Plantão:</span> {selectedEvent.avaliacaoPlantao || "Não Informado"}</div>
                 </div>
               </div>
             </div>

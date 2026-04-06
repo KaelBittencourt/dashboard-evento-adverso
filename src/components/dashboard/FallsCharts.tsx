@@ -858,7 +858,7 @@ export function FallDataTable({ events }: { events: FallEvent[] }) {
                         ? "bg-severity-none/10 text-severity-none"
                         : "bg-severity-moderate/10 text-severity-moderate"
                     }`}>
-                      {e.acompanhante || "—"}
+                      {e.acompanhante || "Não Informado"}
                     </span>
                   </td>
                   <td className="py-2.5 px-4 text-center">
@@ -913,7 +913,7 @@ export function FallDataTable({ events }: { events: FallEvent[] }) {
               <div className="space-y-4">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Paciente</span>
-                  <span className="text-sm font-medium text-foreground">{selectedEvent.nomePaciente || "Não Identificado"}</span>
+                  <span className="text-sm font-medium text-foreground">{selectedEvent.nomePaciente || "Não Informado"}</span>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -923,7 +923,7 @@ export function FallDataTable({ events }: { events: FallEvent[] }) {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Acompanhante</span>
-                    <span className="text-sm text-foreground/90">{selectedEvent.acompanhante || "—"}</span>
+                    <span className="text-sm text-foreground/90">{selectedEvent.acompanhante || "Não Informado"}</span>
                   </div>
                 </div>
 
