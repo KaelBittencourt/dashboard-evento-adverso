@@ -459,11 +459,10 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
                 </div>
                 <div className="text-sm">
                   <span className="font-medium text-muted-foreground">Tipo de Cateter:</span>{" "}
-                  <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                    selectedEvent.tipoCateter === "Central"
-                      ? "bg-destructive/10 text-destructive"
-                      : "bg-primary/10 text-primary"
-                  }`}>
+                  <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${selectedEvent.tipoCateter === "Central"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-primary/10 text-primary"
+                    }`}>
                     {selectedEvent.tipoCateter}
                   </span>
                 </div>
@@ -481,9 +480,8 @@ export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {
                     {selectedEvent.sinaisFlogisticos.map((sinal) => (
                       <span
                         key={sinal}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border ${
-                          SINAL_BADGE_COLORS[sinal] || "bg-muted/50 text-foreground/80 border-border/40"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border ${SINAL_BADGE_COLORS[sinal] || "bg-muted/50 text-foreground/80 border-border/40"
+                          }`}
                       >
                         <div className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
                         {sinal}
@@ -529,12 +527,14 @@ export function PhlebitisInsightsPanel({ insights }: { insights: { type: "danger
         <span className="ml-auto text-[11px] font-medium text-muted-foreground/70 bg-muted px-2 py-0.5 rounded-full">{insights.length} alerta{insights.length > 1 ? "s" : ""}</span>
       </div>
       <div className="flex flex-col gap-2">
-        {insights.map((insight, i) => { const config = typeConfig[insight.type]; const Icon = config.icon; return (
-          <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 hover:translate-x-0.5 ${config.border} ${config.bg}`}>
-            <Icon size={14} className={`mt-0.5 flex-shrink-0 ${config.iconColor}`} />
-            <p className="text-[13px] text-foreground/85 leading-relaxed">{insight.message}</p>
-          </div>
-        ); })}
+        {insights.map((insight, i) => {
+          const config = typeConfig[insight.type]; const Icon = config.icon; return (
+            <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 hover:translate-x-0.5 ${config.border} ${config.bg}`}>
+              <Icon size={14} className={`mt-0.5 flex-shrink-0 ${config.iconColor}`} />
+              <p className="text-[13px] text-foreground/85 leading-relaxed">{insight.message}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

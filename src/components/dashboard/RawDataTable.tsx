@@ -15,7 +15,7 @@ interface RawDataTableProps {
 
 export function RawDataTable({ events }: RawDataTableProps) {
   const [selectedEvent, setSelectedEvent] = useState<AdverseEvent | null>(null);
-  
+
   // Ordenar eventos da data mais recente para a mais antiga
   const sortedEvents = [...events].sort((a, b) => {
     const timeA = a.dataEvento?.getTime() || a.timestamp?.getTime() || 0;
@@ -93,15 +93,14 @@ export function RawDataTable({ events }: RawDataTableProps) {
                     </td>
                     <td className="py-2.5 px-4 text-xs">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${
-                          e.danos === "Morte" || e.danos === "Severo"
-                            ? "bg-destructive/10 text-destructive"
-                            : e.danos === "Moderado"
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${e.danos === "Morte" || e.danos === "Severo"
+                          ? "bg-destructive/10 text-destructive"
+                          : e.danos === "Moderado"
                             ? "bg-severity-moderate/10 text-severity-moderate"
                             : e.danos === "Leve"
-                            ? "bg-primary/10 text-primary"
-                            : "bg-severity-none/10 text-severity-none"
-                        }`}
+                              ? "bg-primary/10 text-primary"
+                              : "bg-severity-none/10 text-severity-none"
+                          }`}
                       >
                         {e.danos || "Não Informado"}
                       </span>
@@ -131,7 +130,7 @@ export function RawDataTable({ events }: RawDataTableProps) {
               Resumo completo dos dados preenchidos no formulário
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedEvent && (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
@@ -158,13 +157,12 @@ export function RawDataTable({ events }: RawDataTableProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="text-sm"><span className="font-medium text-muted-foreground">Tipo de Evento:</span> {selectedEvent.tipoEvento || "Não Informado"}</div>
                   <div className="text-sm"><span className="font-medium text-muted-foreground">Data do Evento:</span> {selectedEvent.dataEvento ? selectedEvent.dataEvento.toLocaleString('pt-BR') : "Não Informado"}</div>
-                  <div className="text-sm"><span className="font-medium text-muted-foreground">Gravidade dos Danos:</span> 
-                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        selectedEvent.danos === "Morte" || selectedEvent.danos === "Severo"
-                          ? "bg-destructive/10 text-destructive"
-                          : selectedEvent.danos === "Moderado"
-                          ? "bg-severity-moderate/10 text-severity-moderate"
-                          : selectedEvent.danos === "Leve"
+                  <div className="text-sm"><span className="font-medium text-muted-foreground">Gravidade dos Danos:</span>
+                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${selectedEvent.danos === "Morte" || selectedEvent.danos === "Severo"
+                      ? "bg-destructive/10 text-destructive"
+                      : selectedEvent.danos === "Moderado"
+                        ? "bg-severity-moderate/10 text-severity-moderate"
+                        : selectedEvent.danos === "Leve"
                           ? "bg-primary/10 text-primary"
                           : "bg-severity-none/10 text-severity-none"
                       }`}>
@@ -183,7 +181,7 @@ export function RawDataTable({ events }: RawDataTableProps) {
                     <div className="text-sm"><span className="font-medium text-muted-foreground">Houve Transferência de Setor?</span> {selectedEvent.transferenciaSETOR || "Não Informado"}</div>
                     <div className="text-sm"><span className="font-medium text-muted-foreground">Houve Transferência de Instituição?</span> {selectedEvent.transferenciaINSTITUICAO || "Não Informado"}</div>
                     {selectedEvent.localTransferencia && (
-                        <div className="text-sm md:col-span-2"><span className="font-medium text-muted-foreground">Local da Transferência:</span> {selectedEvent.localTransferencia}</div>
+                      <div className="text-sm md:col-span-2"><span className="font-medium text-muted-foreground">Local da Transferência:</span> {selectedEvent.localTransferencia}</div>
                     )}
                   </div>
                 </div>

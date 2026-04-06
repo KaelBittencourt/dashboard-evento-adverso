@@ -977,15 +977,6 @@ export function FallDataTable({ events }: { events: FallEvent[] }) {
                 )}
               </div>
             </div>
-            
-            <div className="px-5 py-3 border-t border-border bg-muted/10 flex justify-end">
-              <button 
-                onClick={() => setSelectedEvent(null)}
-                className="px-4 py-2 bg-secondary/80 text-secondary-foreground hover:bg-secondary rounded-md text-[13px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
-              >
-                Fechar
-              </button>
-            </div>
           </div>
         </div>
       )}
