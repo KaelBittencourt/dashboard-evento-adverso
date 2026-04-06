@@ -135,7 +135,7 @@ export default function Quedas() {
               <DashboardSwitcher />
 
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSc82dwssQmjmqrnE9ACIBHYX_b1FRqC3JwlVqs6M3TgEuWdig/viewform"
+                href="https://forms.gle/ZWw8ude5L7epkGGi6"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-md text-sm font-medium transition-colors flex-shrink-0"
