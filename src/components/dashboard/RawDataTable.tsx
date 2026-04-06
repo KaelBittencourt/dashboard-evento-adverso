@@ -16,8 +16,15 @@ interface RawDataTableProps {
 export function RawDataTable({ events }: RawDataTableProps) {
   const [selectedEvent, setSelectedEvent] = useState<AdverseEvent | null>(null);
   
+  // Ordenar eventos da data mais recente para a mais antiga
+  const sortedEvents = [...events].sort((a, b) => {
+    const timeA = a.dataEvento?.getTime() || a.timestamp?.getTime() || 0;
+    const timeB = b.dataEvento?.getTime() || b.timestamp?.getTime() || 0;
+    return timeB - timeA;
+  });
+
   // Limitar a exibição inicial caso haja muitos dados para não travar a UI (ex: 100 mais recentes)
-  const displayEvents = events.slice(0, 100);
+  const displayEvents = sortedEvents.slice(0, 100);
 
   return (
     <>
