@@ -1,19 +1,19 @@
 import { useFalhasMedicacao, MedErrorFilters } from "@/hooks/useFalhasMedicacao";
 import {
-  getMedErrorKPIs, getMedErrorEvolution, getMedErrorByTipo, getMedErrorByVia,
+  getMedErrorKPIs, getMedErrorEvolution, getMedErrorByMarca, getMedErrorByVia,
   getMedErrorTopMedicamentos, getMedErrorByTurno, getMedErrorByWeekday,
   getMedErrorHeatmap, generateMedErrorInsights,
 } from "@/lib/medErrorAnalytics";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import {
-  MedErrorEvolutionChart, MedErrorTipoFalhaChart, MedErrorViaChart,
+  MedErrorEvolutionChart, MedErrorViaChart,
   MedErrorTopMedChart, MedErrorTurnoChart, MedErrorWeekdayChart,
   MedErrorHeatmapChart, MedErrorDataTable, MedErrorInsightsPanel,
 } from "@/components/dashboard/MedErrorCharts";
 import { DashboardSwitcher } from "@/components/dashboard/DashboardSwitcher";
 import {
   RefreshCw, Filter, Calendar, Plus, AlertTriangle, CalendarDays,
-  Pill, Clock, BarChart2, ShieldX, Moon, TrendingUp,
+  Pill, BarChart2, ShieldX, TrendingUp,
 } from "lucide-react";
 import { useRef, useMemo } from "react";
 
@@ -43,7 +43,7 @@ export default function FalhasMedicacao() {
   /* ── Analytics (memoizados) ── */
   const kpis = useMemo(() => getMedErrorKPIs(filteredEvents), [filteredEvents]);
   const evolutionData = useMemo(() => getMedErrorEvolution(filteredEvents), [filteredEvents]);
-  const tipoData = useMemo(() => getMedErrorByTipo(filteredEvents), [filteredEvents]);
+  const marcaData = useMemo(() => getMedErrorByMarca(filteredEvents), [filteredEvents]);
   const viaData = useMemo(() => getMedErrorByVia(filteredEvents), [filteredEvents]);
   const topMedData = useMemo(() => getMedErrorTopMedicamentos(filteredEvents), [filteredEvents]);
   const turnoData = useMemo(() => getMedErrorByTurno(filteredEvents), [filteredEvents]);
@@ -114,7 +114,7 @@ export default function FalhasMedicacao() {
               </div>
 
               {/* Data início */}
-              <div className="flex-1 min-w-[115px] relative">
+              <div className="flex-shrink-0 w-[135px] sm:w-[145px] relative">
                 <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => startRef.current?.showPicker()}>
                   <Calendar size={13} strokeWidth={2.5} />
                 </div>
@@ -131,7 +131,7 @@ export default function FalhasMedicacao() {
               <span className="text-muted-foreground text-xs text-center flex-shrink-0">até</span>
 
               {/* Data fim */}
-              <div className="flex-1 min-w-[115px] relative">
+              <div className="flex-shrink-0 w-[135px] sm:w-[145px] relative">
                 <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => endRef.current?.showPicker()}>
                   <Calendar size={13} strokeWidth={2.5} />
                 </div>
@@ -146,16 +146,8 @@ export default function FalhasMedicacao() {
                 />
               </div>
 
-              {/* Tipo de Falha */}
-              <div className="flex-1 min-w-[140px]">
-                <select value={filters.tipoFalha} onChange={(e) => update("tipoFalha", e.target.value)} className={selectClass}>
-                  <option value="">Todos os tipos</option>
-                  {options.tiposFalha.map((t) => (<option key={t} value={t}>{t}</option>))}
-                </select>
-              </div>
-
               {/* Via */}
-              <div className="flex-1 min-w-[120px]">
+              <div className="flex-shrink-0 w-[140px] sm:w-[150px]">
                 <select value={filters.via} onChange={(e) => update("via", e.target.value)} className={selectClass}>
                   <option value="">Todas as vias</option>
                   {options.vias.map((v) => (<option key={v} value={v}>{v}</option>))}
@@ -163,7 +155,7 @@ export default function FalhasMedicacao() {
               </div>
 
               {/* Medicamento */}
-              <div className="flex-1 min-w-[140px]">
+              <div className="flex-shrink-0 w-[180px] sm:w-[200px] lg:w-[240px]">
                 <select value={filters.medicamento} onChange={(e) => update("medicamento", e.target.value)} className={selectClass}>
                   <option value="">Todos os medicamentos</option>
                   {options.medicamentos.map((m) => (<option key={m} value={m}>{m}</option>))}
@@ -216,34 +208,34 @@ export default function FalhasMedicacao() {
           <>
             {/* ── KPIs Linha 1 ── */}
             <section>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 min-w-0">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 min-w-0">
                 <KpiCard title="Total de Falhas" value={kpis.total} icon={<AlertTriangle className="text-destructive" />} variant="danger" mono />
                 <KpiCard title="Últimos 30 dias" value={kpis.last30} icon={<CalendarDays className="text-muted-foreground" />} mono trend={kpis.trend} trendLabel="vs 30d ant." />
                 <KpiCard title="Média/Mês" value={kpis.mediaPorMes} icon={<BarChart2 className="text-muted-foreground" />} mono subtitle="falhas por mês" />
-                <KpiCard title="Horário Incorreto" value={`${kpis.taxaHorarioIncorreto}%`} icon={<Clock className="text-amber-500" />} variant="warning" mono subtitle="falhas de horário" />
                 <KpiCard title="Medicamentos Únicos" value={kpis.medicamentosUnicos} icon={<Pill className="text-primary" />} variant="primary" mono subtitle="envolvidos em falhas" />
               </div>
             </section>
 
             {/* ── KPIs Linha 2 ── */}
             <section>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 min-w-0">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 min-w-0">
                 {kpis.topMedicamento && (
                   <KpiCard
                     title="Medicamento Mais Citado"
-                    value={kpis.topMedicamento[0].length > 22 ? kpis.topMedicamento[0].slice(0, 20) + "…" : kpis.topMedicamento[0]}
+                    value={kpis.topMedicamento[0]}
                     icon={<Pill className="text-destructive" />}
                     variant="danger"
                     subtitle={`${kpis.topMedicamento[1]} ocorrências`}
+                    valueClassName="text-[13px] leading-tight line-clamp-3 text-wrap break-words"
                   />
                 )}
-                {kpis.topTipoFalha && (
+                {kpis.topMarca && (
                   <KpiCard
-                    title="Falha Mais Frequente"
-                    value={kpis.topTipoFalha[0].length > 22 ? kpis.topTipoFalha[0].slice(0, 20) + "…" : kpis.topTipoFalha[0]}
+                    title="Marca Maior Ofensora"
+                    value={kpis.topMarca[0].length > 22 ? kpis.topMarca[0].slice(0, 20) + "…" : kpis.topMarca[0]}
                     icon={<ShieldX className="text-amber-500" />}
                     variant="warning"
-                    subtitle={`${kpis.topTipoFalha[1]} ocorrências`}
+                    subtitle={`${kpis.topMarca[1]} ocorrências`}
                   />
                 )}
                 {kpis.topVia && (
@@ -254,23 +246,15 @@ export default function FalhasMedicacao() {
                     subtitle={`${kpis.topVia[1]} falhas`}
                   />
                 )}
-                <KpiCard
-                  title="Fim de Semana"
-                  value={`${kpis.eventosFimDeSemana}`}
-                  icon={<Moon className="text-purple-400" />}
-                  mono
-                  subtitle={`${kpis.total > 0 ? ((kpis.eventosFimDeSemana / kpis.total) * 100).toFixed(0) : 0}% do total`}
-                />
               </div>
             </section>
 
             {/* ── Insights ── */}
             <MedErrorInsightsPanel insights={insights} />
 
-            {/* ── Evolução + Tipo de Falha ── */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* ── Evolução ── */}
+            <section className="col-span-full">
               <MedErrorEvolutionChart data={evolutionData} />
-              <MedErrorTipoFalhaChart data={tipoData} />
             </section>
 
             {/* ── Top Medicamentos + Via ── */}

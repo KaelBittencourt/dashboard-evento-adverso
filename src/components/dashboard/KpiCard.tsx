@@ -10,6 +10,7 @@ interface KpiCardProps {
   icon: ReactNode;
   variant?: "default" | "primary" | "danger" | "warning" | "success";
   mono?: boolean;
+  valueClassName?: string;
 }
 
 const variantConfig = {
@@ -49,6 +50,7 @@ export function KpiCard({
   icon,
   variant = "default",
   mono = false,
+  valueClassName,
 }: KpiCardProps) {
   const trendNum = trend ? parseFloat(trend) : null;
   const isUp = trendNum !== null && trendNum > 0;
@@ -80,9 +82,10 @@ export function KpiCard({
         {/* Value row */}
         <div className="flex items-baseline gap-2">
           <span
-            className={`text-[1.35rem] font-bold leading-none tracking-tight truncate ${
+            className={`font-bold tracking-tight ${
               mono ? "font-mono" : ""
-            } ${config.valueColor}`}
+            } ${config.valueColor} ${valueClassName || "text-[1.35rem] leading-none truncate"}`}
+            title={typeof value === "string" ? value : undefined}
           >
             {value}
           </span>

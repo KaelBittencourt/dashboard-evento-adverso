@@ -197,6 +197,14 @@ function parseDate(str: string): Date | null {
    para evitar duplicatas (ex: "cloreto de sódio" vs "cloreto de sodio")
    ═══════════════════════════════════════════════════════ */
 
+function normalizeMarca(raw: string): string {
+  if (!raw) return "Não informado";
+  const semAcento = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const limpo = semAcento.replace(/\s+/g, " ").trim().toUpperCase();
+  if (!limpo || limpo === "-" || limpo === "N/A" || limpo === "NAO SE APLICA" || limpo === "NÃO SE APLICA" || limpo === "N") return "Não informado";
+  return limpo;
+}
+
 function normalizeMedicamento(raw: string): string {
   if (!raw) return "";
   // Remove acentos usando decomposição Unicode
@@ -236,7 +244,7 @@ function rowToEvent(r: string[]): MedErrorEvent {
     via: (r[2] || "").trim().toUpperCase(),
     lote: (r[3] || "").trim(),
     validade: (r[4] || "").trim(),
-    marca: (r[5] || "").trim(),
+    marca: normalizeMarca(r[5] || ""),
     descricaoFalha: rawDesc,
     tipoFalha: classifyFalha(rawDesc),
     turno,

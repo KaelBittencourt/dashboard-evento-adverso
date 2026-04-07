@@ -39,13 +39,15 @@ function ChartCard({ title, subtitle, children, className = "" }: {
   title: string; subtitle?: string; children: React.ReactNode; className?: string;
 }) {
   return (
-    <div className={`group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-card/80 p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 animate-fade-in ${className}`}>
+    <div className={`group relative flex flex-col h-full overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-card/80 p-5 transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 animate-fade-in ${className}`}>
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="mb-4">
+      <div className="mb-4 flex-shrink-0">
         <h3 className="text-sm font-semibold text-foreground tracking-tight">{title}</h3>
         {subtitle && <p className="text-[11px] text-foreground/60 mt-0.5">{subtitle}</p>}
       </div>
-      {children}
+      <div className="flex-1 flex flex-col justify-center">
+        {children}
+      </div>
     </div>
   );
 }
@@ -80,13 +82,13 @@ export function MedErrorEvolutionChart({ data }: { data: { month: string; total:
 }
 
 /* ═══════════════════════════════════════════════════════
-   2. POR TIPO DE FALHA (barras horizontais)
+   2. POR MARCA (barras horizontais)
    ═══════════════════════════════════════════════════════ */
 
-export function MedErrorTipoFalhaChart({ data }: { data: { name: string; value: number }[] }) {
+export function MedErrorMarcaChart({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
-    <ChartCard title="Por Tipo de Falha" subtitle="Distribuição das categorias de erro">
+    <ChartCard title="Por Marca" subtitle="Distribuição de problemas por marca">
       <div className="w-full flex flex-col justify-center gap-3 pr-1">
         {data.map((item, i) => {
           const pct = total > 0 ? (item.value / total) * 100 : 0;
@@ -172,8 +174,8 @@ export function MedErrorViaChart({ data }: { data: { name: string; value: number
             <>
               {/* Centro do Donut — z-0 para ficar atrás do tooltip */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-                <span className="text-2xl font-black text-foreground tabular-nums">{total}</span>
-                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Total</span>
+                <span className="text-3xl font-black text-foreground tabular-nums">{total}</span>
+                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">Total</span>
               </div>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -181,8 +183,8 @@ export function MedErrorViaChart({ data }: { data: { name: string; value: number
                     data={data}
                     cx="50%"
                     cy="50%"
-                    innerRadius={48}
-                    outerRadius={72}
+                    innerRadius="50%"
+                    outerRadius="80%"
                     paddingAngle={3}
                     dataKey="value"
                     stroke="hsl(var(--card))"
@@ -251,7 +253,7 @@ export function MedErrorTopMedChart({ data }: { data: { name: string; value: num
       subtitle="Top 10 medicamentos com falhas"
       className="lg:col-span-2"
     >
-      <div className="w-full flex flex-col gap-3 mt-1">
+      <div className="w-full flex flex-col gap-4 sm:gap-5 py-2 h-full justify-between flex-1">
         {data.slice(0, 10).map((item, i) => {
           const pct = total > 0 ? (item.value / total) * 100 : 0;
           const barWidth = maxVal > 0 ? (item.value / maxVal) * 100 : 0;
@@ -327,7 +329,7 @@ export function MedErrorTurnoChart({ data }: { data: { turno: string; total: num
 
   return (
     <ChartCard title="Por Turno" subtitle="Distribuição de falhas por turno">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4 sm:gap-6 w-full h-full justify-center">
         {data.map((item) => {
           const config = TURNO_CONFIG[item.turno] || TURNO_CONFIG["Manhã"];
           const pct = total > 0 ? (item.total / total) * 100 : 0;
@@ -337,11 +339,10 @@ export function MedErrorTurnoChart({ data }: { data: { turno: string; total: num
           return (
             <div
               key={item.turno}
-              className={`group relative flex items-center gap-4 rounded-xl border px-4 py-3.5 transition-all duration-300 hover:translate-y-[-1px] hover:shadow-lg ${
-                isMax
-                  ? "border-primary/30 bg-primary/[0.04]"
-                  : "border-border/30 bg-muted/10 hover:border-border/50"
-              }`}
+              className={`group relative flex items-center gap-4 rounded-xl border px-4 py-3.5 transition-all duration-300 hover:translate-y-[-1px] hover:shadow-lg ${isMax
+                ? "border-primary/30 bg-primary/[0.04]"
+                : "border-border/30 bg-muted/10 hover:border-border/50"
+                }`}
               style={isMax ? { boxShadow: `0 4px 20px ${config.glow}15` } : {}}
             >
               {/* Ícone + nome */}
@@ -543,11 +544,11 @@ export function MedErrorDataTable({ events }: { events: MedErrorEvent[] }) {
                   onClick={() => setSelectedEvent(e)}
                   className="border-b border-border/20 hover:bg-primary/[0.05] transition-colors cursor-pointer"
                 >
-                  <td className="py-2.5 px-4 text-xs font-mono text-muted-foreground">{e.timestamp?.toLocaleDateString("pt-BR") || "—"}</td>
-                  <td className="py-2.5 px-4 text-xs font-medium text-foreground max-w-[180px] truncate" title={e.medicamento}>{e.medicamento || "—"}</td>
-                  <td className="py-2.5 px-4 text-xs text-foreground/80">{e.via || "—"}</td>
-                  <td className="py-2.5 px-4 text-xs text-destructive/90">{e.tipoFalha}</td>
-                  <td className="py-2.5 px-4 text-xs text-muted-foreground">{e.marca || "—"}</td>
+                  <td className="py-2.5 px-4 text-xs font-mono text-muted-foreground">{e.timestamp?.toLocaleDateString("pt-BR") || "Não informado"}</td>
+                  <td className="py-2.5 px-4 text-xs font-medium text-foreground max-w-[180px] truncate" title={e.medicamento}>{e.medicamento || "Não informado"}</td>
+                  <td className="py-2.5 px-4 text-xs text-foreground/80">{e.via || "Não informado"}</td>
+                  <td className="py-2.5 px-4 text-xs text-destructive/90">{e.tipoFalha || "Não informado"}</td>
+                  <td className="py-2.5 px-4 text-xs text-muted-foreground">{e.marca || "Não informado"}</td>
                 </tr>
               ))}
             </tbody>
@@ -569,24 +570,24 @@ export function MedErrorDataTable({ events }: { events: MedErrorEvent[] }) {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Dados do Medicamento</h4>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Nome:</span> {selectedEvent.medicamento || "—"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Via:</span> {selectedEvent.via || "—"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Lote:</span> {selectedEvent.lote || "—"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Validade:</span> {selectedEvent.validade || "—"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Marca:</span> {selectedEvent.marca || "—"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Nome:</span> {selectedEvent.medicamento || "Não informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Via:</span> {selectedEvent.via || "Não informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Lote:</span> {selectedEvent.lote || "Não informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Validade:</span> {selectedEvent.validade || "Não informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Marca:</span> {selectedEvent.marca || "Não informado"}</div>
               </div>
 
               <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-border/40 pb-2 mb-2">Dados do Evento</h4>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Data/Hora:</span> {selectedEvent.timestamp ? selectedEvent.timestamp.toLocaleString("pt-BR") : "—"}</div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Tipo de Falha:</span> <span className="font-semibold text-destructive">{selectedEvent.tipoFalha}</span></div>
-                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno:</span> {selectedEvent.turno || "—"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Data/Hora:</span> {selectedEvent.timestamp ? selectedEvent.timestamp.toLocaleString("pt-BR") : "Não informado"}</div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Tipo de Falha:</span> <span className="font-semibold text-destructive">{selectedEvent.tipoFalha || "Não informado"}</span></div>
+                <div className="text-sm"><span className="font-medium text-muted-foreground">Turno:</span> {selectedEvent.turno || "Não informado"}</div>
               </div>
 
               <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20 md:col-span-2 space-y-3">
                 <h4 className="font-semibold text-sm border-b border-destructive/20 pb-2 mb-2">Relato Completo</h4>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
-                  {selectedEvent.descricaoFalha || "—"}
+                  {selectedEvent.descricaoFalha || "Não informado"}
                 </p>
               </div>
             </div>

@@ -12,7 +12,7 @@ export interface MedErrorKPIs {
   prev30: number;
   trend: string | null;
   topMedicamento: [string, number] | null;
-  topTipoFalha: [string, number] | null;
+  topMarca: [string, number] | null;
   topVia: [string, number] | null;
   mediaPorMes: string;
   eventosSemanaUtil: number;
@@ -37,14 +37,14 @@ export function getMedErrorKPIs(events: MedErrorEvent[]): MedErrorKPIs {
 
   // Agrupamentos
   const byMed: Record<string, number> = {};
-  const byTipo: Record<string, number> = {};
+  const byMarca: Record<string, number> = {};
   const byVia: Record<string, number> = {};
   const byTurno: Record<string, number> = {};
 
   events.forEach((e) => {
     const nome = e.medicamento?.trim();
     if (nome) byMed[nome] = (byMed[nome] || 0) + 1;
-    if (e.tipoFalha) byTipo[e.tipoFalha] = (byTipo[e.tipoFalha] || 0) + 1;
+    if (e.marca && e.marca !== "Não informado") byMarca[e.marca] = (byMarca[e.marca] || 0) + 1;
     if (e.via) byVia[e.via] = (byVia[e.via] || 0) + 1;
     if (e.turno) byTurno[e.turno] = (byTurno[e.turno] || 0) + 1;
   });
@@ -70,7 +70,7 @@ export function getMedErrorKPIs(events: MedErrorEvent[]): MedErrorKPIs {
     prev30,
     trend,
     topMedicamento: topEntry(byMed),
-    topTipoFalha: topEntry(byTipo),
+    topMarca: topEntry(byMarca),
     topVia: topEntry(byVia),
     mediaPorMes,
     eventosSemanaUtil,
@@ -108,12 +108,12 @@ export function getMedErrorEvolution(events: MedErrorEvent[]) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   POR TIPO DE FALHA
+   POR MARCA
    ═══════════════════════════════════════════════════════ */
 
-export function getMedErrorByTipo(events: MedErrorEvent[]) {
+export function getMedErrorByMarca(events: MedErrorEvent[]) {
   const counts: Record<string, number> = {};
-  events.forEach((e) => { if (e.tipoFalha) counts[e.tipoFalha] = (counts[e.tipoFalha] || 0) + 1; });
+  events.forEach((e) => { if (e.marca && e.marca !== "Não informado") counts[e.marca] = (counts[e.marca] || 0) + 1; });
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 }
 
@@ -200,9 +200,9 @@ export function generateMedErrorInsights(events: MedErrorEvent[]) {
     insights.push({ type: "success", message: `✅ Redução de ${pct}% nas falhas nos últimos 30 dias. Boa evolução!` });
   }
 
-  if (kpis.topTipoFalha) {
-    const pct = kpis.total > 0 ? ((kpis.topTipoFalha[1] / kpis.total) * 100).toFixed(0) : 0;
-    insights.push({ type: "danger", message: `🔴 Tipo de falha mais frequente: "${kpis.topTipoFalha[0]}" com ${kpis.topTipoFalha[1]} ocorrências (${pct}%).` });
+  if (kpis.topMarca) {
+    const pct = kpis.total > 0 ? ((kpis.topMarca[1] / kpis.total) * 100).toFixed(0) : 0;
+    insights.push({ type: "danger", message: `🔴 Marca com mais problemas: "${kpis.topMarca[0]}" com ${kpis.topMarca[1]} ocorrências (${pct}%).` });
   }
 
   if (kpis.topMedicamento) {
