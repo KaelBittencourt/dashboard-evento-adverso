@@ -80,7 +80,7 @@ export default function Quedas() {
 
   const clearFilters = () =>
     setFilters({
-      dateStart: `${new Date().getFullYear()}-01-01`,
+      dateStart: "",
       dateEnd: "",
       localQueda: "",
       unidade: "",
@@ -89,7 +89,7 @@ export default function Quedas() {
     });
 
   const hasFilters =
-    filters.dateStart !== `${new Date().getFullYear()}-01-01` ||
+    filters.dateStart !== "" ||
     filters.dateEnd !== "" ||
     filters.localQueda !== "" ||
     filters.unidade !== "" ||
