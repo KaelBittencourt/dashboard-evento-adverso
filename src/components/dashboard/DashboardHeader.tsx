@@ -82,14 +82,14 @@ export function DashboardHeader({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <DashboardSwitcher />
 
-            <a 
-              href="https://docs.google.com/forms/d/e/1FAIpQLSc82dwssQmjmqrnE9ACIBHYX_b1FRqC3JwlVqs6M3TgEuWdig/viewform" 
-              target="_blank" 
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSc82dwssQmjmqrnE9ACIBHYX_b1FRqC3JwlVqs6M3TgEuWdig/viewform"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 rounded-md text-sm font-medium transition-colors flex-shrink-0"
             >
               <Plus size={16} />
-              Registrar Evento
+              Registrar Evento Adverso
             </a>
           </div>
 

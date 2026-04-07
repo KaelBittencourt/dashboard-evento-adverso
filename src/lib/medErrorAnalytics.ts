@@ -2,7 +2,9 @@ import { MedErrorEvent } from "@/hooks/useFalhasMedicacao";
 import { format, differenceInDays, getDay, getHours } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-/* ──────────────── KPIs ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   KPIs
+   ═══════════════════════════════════════════════════════ */
 
 export interface MedErrorKPIs {
   total: number;
@@ -20,7 +22,12 @@ export interface MedErrorKPIs {
   taxaHorarioIncorreto: string;
 }
 
-export function getMedErrorKPIs(events: MedErrorEvent[], all: MedErrorEvent[]): MedErrorKPIs {
+function topEntry(map: Record<string, number>): [string, number] | null {
+  const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
+  return sorted[0] ? [sorted[0][0], sorted[0][1]] : null;
+}
+
+export function getMedErrorKPIs(events: MedErrorEvent[]): MedErrorKPIs {
   const total = events.length;
   const now = new Date();
 
@@ -28,23 +35,19 @@ export function getMedErrorKPIs(events: MedErrorEvent[], all: MedErrorEvent[]): 
   const prev30 = events.filter((e) => e.timestamp && differenceInDays(now, e.timestamp) > 30 && differenceInDays(now, e.timestamp) <= 60).length;
   const trend = prev30 > 0 ? (((last30 - prev30) / prev30) * 100).toFixed(1) : null;
 
-  // Top medicamento
+  // Agrupamentos
   const byMed: Record<string, number> = {};
-  events.forEach((e) => { if (e.medicamento) byMed[e.medicamento.toUpperCase().trim()] = (byMed[e.medicamento.toUpperCase().trim()] || 0) + 1; });
-  const topMedEntry = Object.entries(byMed).sort((a, b) => b[1] - a[1])[0] || null;
-  const topMedicamento = topMedEntry ? [topMedEntry[0], topMedEntry[1]] as [string, number] : null;
-
-  // Top tipo de falha
   const byTipo: Record<string, number> = {};
-  events.forEach((e) => { if (e.tipoFalha) byTipo[e.tipoFalha] = (byTipo[e.tipoFalha] || 0) + 1; });
-  const topTipoEntry = Object.entries(byTipo).sort((a, b) => b[1] - a[1])[0] || null;
-  const topTipoFalha = topTipoEntry ? [topTipoEntry[0], topTipoEntry[1]] as [string, number] : null;
-
-  // Top via
   const byVia: Record<string, number> = {};
-  events.forEach((e) => { if (e.via) byVia[e.via] = (byVia[e.via] || 0) + 1; });
-  const topViaEntry = Object.entries(byVia).sort((a, b) => b[1] - a[1])[0] || null;
-  const topVia = topViaEntry ? [topViaEntry[0], topViaEntry[1]] as [string, number] : null;
+  const byTurno: Record<string, number> = {};
+
+  events.forEach((e) => {
+    const nome = e.medicamento?.trim();
+    if (nome) byMed[nome] = (byMed[nome] || 0) + 1;
+    if (e.tipoFalha) byTipo[e.tipoFalha] = (byTipo[e.tipoFalha] || 0) + 1;
+    if (e.via) byVia[e.via] = (byVia[e.via] || 0) + 1;
+    if (e.turno) byTurno[e.turno] = (byTurno[e.turno] || 0) + 1;
+  });
 
   // Média por mês
   const months = new Set<string>();
@@ -55,22 +58,32 @@ export function getMedErrorKPIs(events: MedErrorEvent[], all: MedErrorEvent[]): 
   const eventosSemanaUtil = events.filter((e) => e.timestamp && getDay(e.timestamp) > 0 && getDay(e.timestamp) < 6).length;
   const eventosFimDeSemana = events.filter((e) => e.timestamp && (getDay(e.timestamp) === 0 || getDay(e.timestamp) === 6)).length;
 
-  // Turno mais frequente
-  const byTurno: Record<string, number> = {};
-  events.forEach((e) => { if (e.turno) byTurno[e.turno] = (byTurno[e.turno] || 0) + 1; });
-  const turnoMaisFrequente = Object.entries(byTurno).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+  const turnoMaisFrequente = topEntry(byTurno)?.[0] || "N/A";
+  const medicamentosUnicos = Object.keys(byMed).filter(Boolean).length;
 
-  // Medicamentos únicos
-  const medicamentosUnicos = Object.keys(byMed).length;
-
-  // Taxa de horário incorreto
   const horarioIncorreto = events.filter((e) => e.tipoFalha === "Horário Incorreto").length;
   const taxaHorarioIncorreto = total > 0 ? ((horarioIncorreto / total) * 100).toFixed(1) : "0";
 
-  return { total, last30, prev30, trend, topMedicamento, topTipoFalha, topVia, mediaPorMes, eventosSemanaUtil, eventosFimDeSemana, turnoMaisFrequente, medicamentosUnicos, taxaHorarioIncorreto };
+  return {
+    total,
+    last30,
+    prev30,
+    trend,
+    topMedicamento: topEntry(byMed),
+    topTipoFalha: topEntry(byTipo),
+    topVia: topEntry(byVia),
+    mediaPorMes,
+    eventosSemanaUtil,
+    eventosFimDeSemana,
+    turnoMaisFrequente,
+    medicamentosUnicos,
+    taxaHorarioIncorreto,
+  };
 }
 
-/* ──────────────── Evolução mensal ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   EVOLUÇÃO MENSAL
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorEvolution(events: MedErrorEvent[]) {
   const byMonth: Record<string, number> = {};
@@ -94,7 +107,9 @@ export function getMedErrorEvolution(events: MedErrorEvent[]) {
     });
 }
 
-/* ──────────────── Por tipo de falha ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   POR TIPO DE FALHA
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorByTipo(events: MedErrorEvent[]) {
   const counts: Record<string, number> = {};
@@ -102,7 +117,9 @@ export function getMedErrorByTipo(events: MedErrorEvent[]) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 }
 
-/* ──────────────── Por via ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   POR VIA DE ADMINISTRAÇÃO
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorByVia(events: MedErrorEvent[]) {
   const counts: Record<string, number> = {};
@@ -110,15 +127,22 @@ export function getMedErrorByVia(events: MedErrorEvent[]) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 }
 
-/* ──────────────── Top medicamentos ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   TOP MEDICAMENTOS
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorTopMedicamentos(events: MedErrorEvent[]) {
   const counts: Record<string, number> = {};
-  events.forEach((e) => { if (e.medicamento) counts[e.medicamento.toUpperCase().trim()] = (counts[e.medicamento.toUpperCase().trim()] || 0) + 1; });
+  events.forEach((e) => {
+    const nome = e.medicamento?.trim();
+    if (nome) counts[nome] = (counts[nome] || 0) + 1;
+  });
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
 }
 
-/* ──────────────── Por turno ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   POR TURNO
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorByTurno(events: MedErrorEvent[]) {
   const turnos = ["Manhã", "Tarde", "Noite"];
@@ -128,7 +152,9 @@ export function getMedErrorByTurno(events: MedErrorEvent[]) {
   return turnos.map((turno) => ({ turno, total: counts[turno] || 0 }));
 }
 
-/* ──────────────── Dia da semana ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   POR DIA DA SEMANA
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorByWeekday(events: MedErrorEvent[]) {
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -137,7 +163,9 @@ export function getMedErrorByWeekday(events: MedErrorEvent[]) {
   return days.map((day, i) => ({ day, count: counts[i] }));
 }
 
-/* ──────────────── Heatmap ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   HEATMAP (DIA × HORA)
+   ═══════════════════════════════════════════════════════ */
 
 export function getMedErrorHeatmap(events: MedErrorEvent[]) {
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -150,15 +178,19 @@ export function getMedErrorHeatmap(events: MedErrorEvent[]) {
     matrix[d][h] = (matrix[d][h] || 0) + 1;
   });
   const data: { day: string; hour: number; value: number }[] = [];
-  days.forEach((day) => { for (let h = 0; h < 24; h++) data.push({ day, hour: h, value: matrix[day]?.[h] || 0 }); });
+  days.forEach((day) => {
+    for (let h = 0; h < 24; h++) data.push({ day, hour: h, value: matrix[day]?.[h] || 0 });
+  });
   return data;
 }
 
-/* ──────────────── Insights ──────────────── */
+/* ═══════════════════════════════════════════════════════
+   INSIGHTS AUTOMÁTICOS
+   ═══════════════════════════════════════════════════════ */
 
-export function generateMedErrorInsights(events: MedErrorEvent[], all: MedErrorEvent[]) {
+export function generateMedErrorInsights(events: MedErrorEvent[]) {
   const insights: { type: "danger" | "warning" | "success"; message: string }[] = [];
-  const kpis = getMedErrorKPIs(events, all);
+  const kpis = getMedErrorKPIs(events);
 
   if (kpis.prev30 > 0 && kpis.last30 > kpis.prev30 * 1.2) {
     const pct = (((kpis.last30 - kpis.prev30) / kpis.prev30) * 100).toFixed(0);
@@ -179,7 +211,7 @@ export function generateMedErrorInsights(events: MedErrorEvent[], all: MedErrorE
 
   if (kpis.eventosFimDeSemana > 0 && kpis.total > 0) {
     const pct = ((kpis.eventosFimDeSemana / kpis.total) * 100).toFixed(0);
-    insights.push({ type: "warning", message: `📅 ${kpis.eventosFimDeSemana} falha(s) ocorreram em finais de semana (${pct}%). Atenção ao plantio.` });
+    insights.push({ type: "warning", message: `📅 ${kpis.eventosFimDeSemana} falha(s) ocorreram em finais de semana (${pct}%). Atenção ao plantão.` });
   }
 
   if (parseFloat(kpis.taxaHorarioIncorreto) > 15) {

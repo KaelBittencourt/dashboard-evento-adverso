@@ -1,5 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 
+/* ═══════════════════════════════════════════════════════
+   TIPOS
+   ═══════════════════════════════════════════════════════ */
+
 export interface MedErrorEvent {
   timestamp: Date | null;
   medicamento: string;
@@ -20,20 +24,102 @@ export interface MedErrorFilters {
   medicamento: string;
 }
 
+/* ═══════════════════════════════════════════════════════
+   CONSTANTES
+   ═══════════════════════════════════════════════════════ */
+
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/1T_4oRct4nvv4Lt2wkHTAz4x7xGyfkDmOVtF4jBrURMo/export?format=csv";
 
+/**
+ * Mapeamento de colunas do CSV:
+ * 0 → Carimbo de data/hora  (DD/MM/YYYY HH:MM:SS)
+ * 1 → NOME MEDICAMENTO
+ * 2 → VIA                   (EV, IM, VO, SC)
+ * 3 → LOTE
+ * 4 → VALIDADE              (DD/MM/YYYY)
+ * 5 → MARCA
+ * 6 → QUAL FALHA OCORREU?   (texto livre, pode ter múltiplas linhas)
+ */
+
+/* ═══════════════════════════════════════════════════════
+   CLASSIFICAÇÃO DE TIPO DE FALHA
+   ═══════════════════════════════════════════════════════ */
+
 const TIPO_FALHA_MAP: { keywords: string[]; tipo: string }[] = [
-  { keywords: ["horario errado", "hor\xe1rio errado", "periodo errado", "per\xedodo errado", "hora errada", "manh\xe3", "noite", "turno da manh\xe3", "turno da noite", "mandada em hor\xe1rio", "encaminhado para turno", "medica\xe7\xe3o do per\xedodo"], tipo: "Hor\xe1rio Incorreto" },
-  { keywords: ["n\xe3o veio", "nao veio", "n\xe3o foi mandada", "nao foi mandada", "n\xe3o foi enviada", "nao foi enviada", "n\xe3o dispensou", "nao dispensou", "n\xe3o aparece", "nao aparece", "falta algumas"], tipo: "Medica\xe7\xe3o N\xe3o Enviada" },
-  { keywords: ["dilui", "diluir", "reconstitui", "reconstituir", "desprezo", "descarte"], tipo: "Erro de Dilui\xe7\xe3o/Preparo" },
-  { keywords: ["refrigera", "geladeira", "armazena", "r\xf3tulo de abertura", "sem r\xf3tulo", "nao foi colocado", "n\xe3o foi colocado", "etiqueta"], tipo: "Armazenamento Inadequado" },
-  { keywords: ["super dose", "superdose", "dosagem", "metade", "1/2", "metade cp", "dose errada"], tipo: "Erro de Dosagem" },
-  { keywords: ["ev", "im", "via de administra\xe7\xe3o", "via errada", "prescreve", "prescri", "via de admin"], tipo: "Via Incorreta" },
-  { keywords: ["confundir", "misturadas", "troca", "encaminhou em alguns kits", "apresenta"], tipo: "Medicamento Similar/Confus\xe3o" },
-  { keywords: ["falta na male", "falta na mal", "veio em falta"], tipo: "Medica\xe7\xe3o Faltante" },
-  { keywords: ["comunica", "rispida", "rispida", "falta de comunica"], tipo: "Falha de Comunica\xe7\xe3o" },
-  { keywords: ["reembolso", "reembols"], tipo: "Erro de Reembolso" },
+  {
+    keywords: [
+      "horario errado", "horário errado", "periodo errado", "período errado",
+      "hora errada", "mandada em horário", "encaminhado para turno",
+      "medicação do período", "turno da manhã medicação que quem administra",
+      "quem administra é a noite", "encaminhada para o turno",
+    ],
+    tipo: "Horário Incorreto",
+  },
+  {
+    keywords: [
+      "não veio", "nao veio", "não foi mandada", "nao foi mandada",
+      "não foi enviada", "nao foi enviada", "não dispensou", "nao dispensou",
+      "não aparece", "nao aparece", "falta algumas", "não foi manda",
+      "veio em falta",
+    ],
+    tipo: "Medicação Não Enviada",
+  },
+  {
+    keywords: [
+      "diluição", "diluir", "reconstituição", "reconstituir",
+      "desprezo", "descarte", "erro de diluição",
+    ],
+    tipo: "Erro de Diluição/Preparo",
+  },
+  {
+    keywords: [
+      "refrigera", "geladeira", "armazena", "rótulo de abertura",
+      "sem rótulo", "não foi colocado", "nao foi colocado", "etiqueta",
+    ],
+    tipo: "Armazenamento Inadequado",
+  },
+  {
+    keywords: [
+      "super dose", "superdose", "dosagem", "metade", "1/2",
+      "metade cp", "dose errada", "1cp", "1/2cp",
+    ],
+    tipo: "Erro de Dosagem",
+  },
+  {
+    keywords: [
+      "via de administração", "via errada", "prescreve", "prescri",
+      "via de admin",
+    ],
+    tipo: "Via Incorreta",
+  },
+  {
+    keywords: [
+      "confundir", "misturadas", "troca", "encaminhou em alguns kits",
+      "apresenta",
+    ],
+    tipo: "Medicamento Similar/Confusão",
+  },
+  {
+    keywords: ["falta na male", "falta na mal", "veio em falta", "maeleta"],
+    tipo: "Medicação Faltante",
+  },
+  {
+    keywords: ["comunica", "rispida", "falta de comunica"],
+    tipo: "Falha de Comunicação",
+  },
+  {
+    keywords: ["reembolso", "reembols"],
+    tipo: "Erro de Reembolso",
+  },
+  {
+    keywords: ["alergia", "alérgi"],
+    tipo: "Alergia Não Observada",
+  },
+  {
+    keywords: ["prescrever manualmente", "não aparece na prescrição"],
+    tipo: "Falha no Sistema/Prescrição",
+  },
 ];
 
 function classifyFalha(desc: string): string {
@@ -47,34 +133,56 @@ function classifyFalha(desc: string): string {
   return "Outra";
 }
 
+/* ═══════════════════════════════════════════════════════
+   PARSER CSV ROBUSTO (suporta campos multilinha)
+   ═══════════════════════════════════════════════════════ */
+
 function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
   let inQuotes = false;
+
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
     if (ch === '"') {
-      if (inQuotes && text[i + 1] === '"') { cell += '"'; i++; }
-      else inQuotes = !inQuotes;
+      if (inQuotes && text[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
     } else if (ch === "," && !inQuotes) {
-      row.push(cell.trim()); cell = "";
+      row.push(cell.trim());
+      cell = "";
     } else if ((ch === "\n" || ch === "\r") && !inQuotes) {
       if (ch === "\r" && text[i + 1] === "\n") i++;
-      row.push(cell.trim()); rows.push(row); row = []; cell = "";
+      row.push(cell.trim());
+      if (row.some((c) => c !== "")) rows.push(row);
+      row = [];
+      cell = "";
     } else {
       cell += ch;
     }
   }
-  if (cell || row.length) { row.push(cell.trim()); rows.push(row); }
+  if (cell || row.length) {
+    row.push(cell.trim());
+    if (row.some((c) => c !== "")) rows.push(row);
+  }
   return rows;
 }
+
+/* ═══════════════════════════════════════════════════════
+   PARSE DE DATAS
+   ═══════════════════════════════════════════════════════ */
 
 function parseDate(str: string): Date | null {
   if (!str) return null;
   const parts = str.trim().split(" ");
   const datePart = parts[0];
-  const [d, m, y] = datePart.split("/");
+  const segs = datePart.split("/");
+  if (segs.length !== 3) return null;
+  const [d, m, y] = segs;
   if (!d || !m || !y) return null;
   const year = Number(y);
   if (year < 1900 || year > 2100) return null;
@@ -83,27 +191,61 @@ function parseDate(str: string): Date | null {
   return new Date(year, Number(m) - 1, Number(d), Number(hh || 0), Number(mm || 0), Number(ss || 0));
 }
 
+/* ═══════════════════════════════════════════════════════
+   NORMALIZAÇÃO DE NOMES DE MEDICAMENTOS
+   Remove acentos, normaliza espaços e padroniza capitalização
+   para evitar duplicatas (ex: "cloreto de sódio" vs "cloreto de sodio")
+   ═══════════════════════════════════════════════════════ */
+
+function normalizeMedicamento(raw: string): string {
+  if (!raw) return "";
+  // Remove acentos usando decomposição Unicode
+  const semAcento = raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  // Normaliza espaços (múltiplos → um só) e trim
+  const limpo = semAcento.replace(/\s+/g, " ").trim();
+  // Capitaliza: primeira letra de cada palavra maiúscula, resto minúsculo
+  // Exceção para siglas comuns (mg, ml, inj, etc) que ficam minúsculas
+  return limpo
+    .toLowerCase()
+    .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase());
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONVERSÃO LINHA → EVENTO
+   ═══════════════════════════════════════════════════════ */
+
 function rowToEvent(r: string[]): MedErrorEvent {
   const ts = parseDate(r[0]);
+
+  // Turno derivado do horário do timestamp
   let turno = "";
   if (ts) {
     const h = ts.getHours();
-    if (h >= 6 && h < 12) turno = "Manh\xe3";
+    if (h >= 6 && h < 12) turno = "Manhã";
     else if (h >= 12 && h < 18) turno = "Tarde";
     else turno = "Noite";
   }
+
+  const rawDesc = (r[6] || "").replace(/^"|"$/g, "").trim();
+
   return {
     timestamp: ts,
-    medicamento: r[1] || "",
-    via: r[2] || "",
-    lote: r[3] || "",
-    validade: r[4] || "",
-    marca: r[5] || "",
-    descricaoFalha: (r[6] || "").replace(/^"|"$/g, "").trim(),
-    tipoFalha: classifyFalha(r[6] || ""),
+    medicamento: normalizeMedicamento(r[1] || ""),
+    via: (r[2] || "").trim().toUpperCase(),
+    lote: (r[3] || "").trim(),
+    validade: (r[4] || "").trim(),
+    marca: (r[5] || "").trim(),
+    descricaoFalha: rawDesc,
+    tipoFalha: classifyFalha(rawDesc),
     turno,
   };
 }
+
+/* ═══════════════════════════════════════════════════════
+   HOOK PRINCIPAL
+   ═══════════════════════════════════════════════════════ */
 
 export function useFalhasMedicacao() {
   const [events, setEvents] = useState<MedErrorEvent[]>([]);
@@ -112,7 +254,7 @@ export function useFalhasMedicacao() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<MedErrorFilters>({
-    dateStart: `${new Date().getFullYear()}-01-01`,
+    dateStart: "",
     dateEnd: "",
     tipoFalha: "",
     via: "",
@@ -127,7 +269,13 @@ export function useFalhasMedicacao() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       const rows = parseCSV(text);
-      const data = rows.slice(1).filter((r) => r.length >= 5 && r[0]).map(rowToEvent);
+
+      // Pula cabeçalho (linha 0). Exige >= 7 colunas para ter o campo descricaoFalha (índice 6)
+      const data = rows
+        .slice(1)
+        .filter((r) => r.length >= 7 && r[0])
+        .map(rowToEvent);
+
       setEvents(data);
       setLastUpdated(new Date());
     } catch (e) {
@@ -143,6 +291,7 @@ export function useFalhasMedicacao() {
     return () => clearInterval(interval);
   }, []);
 
+  /* Filtragem reativa */
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
       if (filters.tipoFalha && e.tipoFalha !== filters.tipoFalha) return false;
@@ -160,11 +309,22 @@ export function useFalhasMedicacao() {
     });
   }, [events, filters]);
 
+  /* Opções para selects */
   const options = useMemo(() => ({
     tiposFalha: [...new Set(events.map((e) => e.tipoFalha).filter(Boolean))].sort(),
     vias: [...new Set(events.map((e) => e.via).filter(Boolean))].sort(),
     medicamentos: [...new Set(events.map((e) => e.medicamento).filter(Boolean))].sort(),
   }), [events]);
 
-  return { events, filteredEvents, loading, error, lastUpdated, filters, setFilters, options, refetch: fetchData };
+  return {
+    events,
+    filteredEvents,
+    loading,
+    error,
+    lastUpdated,
+    filters,
+    setFilters,
+    options,
+    refetch: fetchData,
+  };
 }
