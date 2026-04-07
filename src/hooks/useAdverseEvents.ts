@@ -131,7 +131,7 @@ export function useAdverseEvents() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<Filters>({
-    dateStart: "2022-08-01",
+    dateStart: `${new Date().getFullYear()}-01-01`,
     dateEnd: "",
     tipoEvento: "",
     unidade: "",

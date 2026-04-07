@@ -36,8 +36,8 @@ export default function Flebite() {
   const insights = generatePhlebitisInsights(filteredEvents, events);
 
   const update = (key: keyof PhlebitisFilters, value: string) => setFilters({ ...filters, [key]: value });
-  const clearFilters = () => setFilters({ dateStart: "2024-01-01", dateEnd: "", membro: "", unidade: "", tipoCateter: "" });
-  const hasFilters = filters.dateStart !== "2024-01-01" || filters.dateEnd !== "" || filters.membro !== "" || filters.unidade !== "" || filters.tipoCateter !== "";
+  const clearFilters = () => setFilters({ dateStart: `${new Date().getFullYear()}-01-01`, dateEnd: "", membro: "", unidade: "", tipoCateter: "" });
+  const hasFilters = filters.dateStart !== `${new Date().getFullYear()}-01-01` || filters.dateEnd !== "" || filters.membro !== "" || filters.unidade !== "" || filters.tipoCateter !== "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -74,7 +74,7 @@ export default function Flebite() {
                 <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => startRef.current?.showPicker()}>
                   <Calendar size={13} strokeWidth={2.5} />
                 </div>
-                <input ref={startRef} type="date" min="2024-01-01" max={new Date().toISOString().split("T")[0]} value={filters.dateStart} onChange={(e) => update("dateStart", e.target.value)} className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`} />
+                <input ref={startRef} type="date" min={`${new Date().getFullYear()}-01-01`} max={new Date().toISOString().split("T")[0]} value={filters.dateStart} onChange={(e) => update("dateStart", e.target.value)} className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`} />
               </div>
               <span className="text-muted-foreground text-xs text-center flex-shrink-0">até</span>
               <div className="flex-1 min-w-[115px] relative">

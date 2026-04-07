@@ -141,7 +141,7 @@ export function useQuedas() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<FallFilters>({
-    dateStart: "2024-01-01",
+    dateStart: `${new Date().getFullYear()}-01-01`,
     dateEnd: "",
     localQueda: "",
     unidade: "",

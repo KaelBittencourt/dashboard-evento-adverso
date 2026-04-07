@@ -38,10 +38,10 @@ export function DashboardHeader({
     setFilters({ ...filters, [key]: value });
 
   const clearFilters = () =>
-    setFilters({ dateStart: "2022-08-01", dateEnd: "", tipoEvento: "", unidade: "", danos: "", turno: "" });
+    setFilters({ dateStart: `${new Date().getFullYear()}-01-01`, dateEnd: "", tipoEvento: "", unidade: "", danos: "", turno: "" });
 
   const hasFilters =
-    filters.dateStart !== "2022-08-01" ||
+    filters.dateStart !== `${new Date().getFullYear()}-01-01` ||
     filters.dateEnd !== "" ||
     filters.tipoEvento !== "" ||
     filters.unidade !== "" ||
@@ -110,12 +110,12 @@ export function DashboardHeader({
               <input
                 ref={startRef}
                 type="date"
-                min="2022-08-01"
+                min={`${new Date().getFullYear()}-01-01`}
                 max={new Date().toISOString().split("T")[0]}
                 value={filters.dateStart}
                 onChange={(e) => update("dateStart", e.target.value)}
                 className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
-                title="Data início (mínimo 01/08/2022)"
+                title="Data início"
                 placeholder="dd/mm/aaaa"
               />
             </div>
@@ -131,7 +131,7 @@ export function DashboardHeader({
               <input
                 ref={endRef}
                 type="date"
-                min="2022-08-01"
+                min={`${new Date().getFullYear()}-01-01`}
                 max={new Date().toISOString().split("T")[0]}
                 value={filters.dateEnd}
                 onChange={(e) => update("dateEnd", e.target.value)}

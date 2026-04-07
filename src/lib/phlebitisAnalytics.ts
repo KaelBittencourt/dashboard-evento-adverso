@@ -215,10 +215,6 @@ export function generatePhlebitisInsights(events: PhlebitisEvent[], all: Phlebit
     insights.push({ type: "warning", message: `🏥 Setor com maior incidência: "${kpis.topUnidade[0]}" com ${kpis.topUnidade[1]} ocorrências (${pct}%).` });
   }
 
-  if (kpis.mediaDiasInstalacao !== "N/A" && parseFloat(kpis.mediaDiasInstalacao) > 3) {
-    insights.push({ type: "warning", message: `⏱️ Tempo médio de permanência do cateter até a flebite: ${kpis.mediaDiasInstalacao} dias. Avaliar troca preventiva.` });
-  }
-
   if (kpis.topSinal) {
     insights.push({ type: "warning", message: `📋 Sinal flogístico mais frequente: "${kpis.topSinal[0]}" — presente em ${kpis.topSinal[1]} notificações.` });
   }

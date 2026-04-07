@@ -80,7 +80,7 @@ export default function Quedas() {
 
   const clearFilters = () =>
     setFilters({
-      dateStart: "2024-01-01",
+      dateStart: `${new Date().getFullYear()}-01-01`,
       dateEnd: "",
       localQueda: "",
       unidade: "",
@@ -89,7 +89,7 @@ export default function Quedas() {
     });
 
   const hasFilters =
-    filters.dateStart !== "2024-01-01" ||
+    filters.dateStart !== `${new Date().getFullYear()}-01-01` ||
     filters.dateEnd !== "" ||
     filters.localQueda !== "" ||
     filters.unidade !== "" ||
@@ -165,7 +165,7 @@ export default function Quedas() {
                 <input
                   ref={startRef}
                   type="date"
-                  min="2024-01-01"
+                  min={`${new Date().getFullYear()}-01-01`}
                   max={new Date().toISOString().split("T")[0]}
                   value={filters.dateStart}
                   onChange={(e) => update("dateStart", e.target.value)}
@@ -185,7 +185,7 @@ export default function Quedas() {
                 <input
                   ref={endRef}
                   type="date"
-                  min="2024-01-01"
+                  min={`${new Date().getFullYear()}-01-01`}
                   max={new Date().toISOString().split("T")[0]}
                   value={filters.dateEnd}
                   onChange={(e) => update("dateEnd", e.target.value)}

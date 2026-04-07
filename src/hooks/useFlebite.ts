@@ -159,7 +159,7 @@ export function useFlebite() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<PhlebitisFilters>({
-    dateStart: "2024-01-01",
+    dateStart: `${new Date().getFullYear()}-01-01`,
     dateEnd: "",
     membro: "",
     unidade: "",

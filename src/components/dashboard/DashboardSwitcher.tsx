@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Activity, ArrowDownCircle, Syringe } from "lucide-react";
+import { Activity, ArrowDownCircle, Syringe, Pill } from "lucide-react";
 
 const dashboards = [
   {
@@ -19,6 +19,12 @@ const dashboards = [
     label: "Flebite",
     icon: Syringe,
     color: "hsl(172, 66%, 50%)",
+  },
+  {
+    path: "/falhas-medicacao",
+    label: "Falhas de Medicação",
+    icon: Pill,
+    color: "hsl(47, 96%, 53%)",
   },
 ];
 
@@ -70,7 +76,7 @@ export function DashboardSwitcher() {
       </div>
 
       {/* Subtitle */}
-      <p className="text-[10px] text-muted-foreground/70 font-medium tracking-wide uppercase pl-1">
+      <p className="text-[10px] text-muted-foreground/70 font-medium tracking-wide uppercase pl-1 pt-1.5">
         Núcleo de Segurança do Paciente
       </p>
     </div>
