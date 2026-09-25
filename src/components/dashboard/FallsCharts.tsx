@@ -15,6 +15,7 @@ import {
   Pie,
 } from "recharts";
 import { FallEvent } from "@/hooks/useQuedas";
+import { useHeatmapColor } from "@/lib/heatmapColor";
 import {
   FallEvolutionData,
   ReincidenteData,
@@ -59,7 +60,7 @@ const CHART_PALETTE = [
 ];
 
 const axisStyle = {
-  fill: "hsl(215, 15%, 52%)",
+  fill: "hsl(var(--muted-foreground))",
   fontSize: 11,
 };
 
@@ -646,6 +647,7 @@ interface HeatmapData {
 }
 
 export function FallHeatmapChart({ data }: { data: HeatmapData[] }) {
+  const cellColor = useHeatmapColor();
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   const maxVal = Math.max(...data.map((d) => d.value), 1);
 
@@ -657,14 +659,7 @@ export function FallHeatmapChart({ data }: { data: HeatmapData[] }) {
     if (matrix[d.day]) matrix[d.day][d.hour] = d.value;
   });
 
-  const getColor = (val: number) => {
-    if (val === 0) return "hsl(220, 14%, 14%)";
-    const t = val / maxVal;
-    const h = 199 - t * 10;
-    const s = 50 + t * 40;
-    const l = 18 + t * 38;
-    return `hsl(${h}, ${s}%, ${l}%)`;
-  };
+  const getColor = (val: number) => cellColor(val, maxVal);
 
   return (
     <ChartCard

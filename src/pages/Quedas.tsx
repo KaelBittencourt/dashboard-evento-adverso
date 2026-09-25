@@ -24,10 +24,10 @@ import {
   FallDataTable,
   FallInsightsPanel,
 } from "@/components/dashboard/FallsCharts";
+import { PeriodFilter } from "@/components/dashboard/PeriodFilter";
 import {
   RefreshCw,
   Filter,
-  Calendar,
   Plus,
   ArrowDownCircle,
   CalendarDays,
@@ -40,11 +40,8 @@ import {
   Moon,
   Activity,
 } from "lucide-react";
-import { useRef } from "react";
 import { DashboardSwitcher } from "@/components/dashboard/DashboardSwitcher";
-
-const inputClass =
-  "bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 w-full placeholder:text-muted-foreground/40";
+import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 
 const selectClass =
   "filter-select bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 pr-7 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 appearance-none cursor-pointer w-full truncate";
@@ -61,9 +58,6 @@ export default function Quedas() {
     options,
     refetch,
   } = useQuedas();
-  const startRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLInputElement>(null);
-
   const kpis = getFallKPIs(filteredEvents, events);
   const evolutionData = getFallEvolutionData(filteredEvents);
   const localData = getFallByLocalData(filteredEvents);
@@ -75,13 +69,12 @@ export default function Quedas() {
   const heatmapData = getFallHeatmapData(filteredEvents);
   const insights = generateFallInsights(filteredEvents, events);
 
-  const update = (key: keyof FallFilters, value: string) =>
+  const update = (key: Exclude<keyof FallFilters, "periods">, value: string) =>
     setFilters({ ...filters, [key]: value });
 
   const clearFilters = () =>
     setFilters({
-      dateStart: "",
-      dateEnd: "",
+      periods: [],
       localQueda: "",
       unidade: "",
       dano: "all",
@@ -89,8 +82,7 @@ export default function Quedas() {
     });
 
   const hasFilters =
-    filters.dateStart !== "" ||
-    filters.dateEnd !== "" ||
+    filters.periods.length > 0 ||
     filters.localQueda !== "" ||
     filters.unidade !== "" ||
     filters.dano !== "all" ||
@@ -114,6 +106,7 @@ export default function Quedas() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Atualiza a cada 5 min</span>
+            <ThemeToggle />
             <button
               onClick={refetch}
               disabled={loading}
@@ -154,42 +147,11 @@ export default function Quedas() {
                 </span>
               </div>
 
-              {/* Dates */}
-              <div className="flex-1 min-w-[115px] relative">
-                <div
-                  className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 flex items-center justify-center p-1"
-                  onClick={() => startRef.current?.showPicker()}
-                >
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input
-                  ref={startRef}
-                  type="date"
-                  min={`${new Date().getFullYear()}-01-01`}
-                  max={new Date().toISOString().split("T")[0]}
-                  value={filters.dateStart}
-                  onChange={(e) => update("dateStart", e.target.value)}
-                  className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
-                />
-              </div>
-              <span className="text-muted-foreground text-xs text-center flex-shrink-0">
-                até
-              </span>
-              <div className="flex-1 min-w-[115px] relative">
-                <div
-                  className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 flex items-center justify-center p-1"
-                  onClick={() => endRef.current?.showPicker()}
-                >
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input
-                  ref={endRef}
-                  type="date"
-                  min={`${new Date().getFullYear()}-01-01`}
-                  max={new Date().toISOString().split("T")[0]}
-                  value={filters.dateEnd}
-                  onChange={(e) => update("dateEnd", e.target.value)}
-                  className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
+              <div className="flex-1 min-w-[180px]">
+                <PeriodFilter
+                  years={options.anos}
+                  value={filters.periods}
+                  onChange={(periods) => setFilters({ ...filters, periods })}
                 />
               </div>
 

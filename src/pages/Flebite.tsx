@@ -11,20 +11,18 @@ import {
   PhlebitisWeekdayChart, PhlebitisHeatmapChart, PhlebitisDataTable, PhlebitisInsightsPanel,
 } from "@/components/dashboard/PhlebitisCharts";
 import { DashboardSwitcher } from "@/components/dashboard/DashboardSwitcher";
+import { PeriodFilter } from "@/components/dashboard/PeriodFilter";
+import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 import {
-  RefreshCw, Filter, Calendar, Plus, Syringe, CalendarDays, Activity,
+  RefreshCw, Filter, Plus, Syringe, CalendarDays, Activity,
   AlertTriangle, Repeat, Building2, Thermometer, BarChart2,
 } from "lucide-react";
-import { useRef } from "react";
+import { currentYearPeriods, samePeriods } from "@/lib/periodFilter";
 
-const inputClass = "bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 w-full placeholder:text-muted-foreground/40";
 const selectClass = "filter-select bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 pr-7 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 appearance-none cursor-pointer w-full truncate";
 
 export default function Flebite() {
   const { events, filteredEvents, loading, error, lastUpdated, filters, setFilters, options, refetch } = useFlebite();
-  const startRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLInputElement>(null);
-
   const kpis = getPhlebitisKPIs(filteredEvents, events);
   const evolutionData = getPhlebitisEvolution(filteredEvents);
   const membroData = getPhlebitisByMembro(filteredEvents);
@@ -35,9 +33,10 @@ export default function Flebite() {
   const heatmapData = getPhlebitisHeatmap(filteredEvents);
   const insights = generatePhlebitisInsights(filteredEvents, events);
 
-  const update = (key: keyof PhlebitisFilters, value: string) => setFilters({ ...filters, [key]: value });
-  const clearFilters = () => setFilters({ dateStart: `${new Date().getFullYear()}-01-01`, dateEnd: "", membro: "", unidade: "", tipoCateter: "" });
-  const hasFilters = filters.dateStart !== `${new Date().getFullYear()}-01-01` || filters.dateEnd !== "" || filters.membro !== "" || filters.unidade !== "" || filters.tipoCateter !== "";
+  const update = (key: Exclude<keyof PhlebitisFilters, "periods">, value: string) => setFilters({ ...filters, [key]: value });
+  const defaultPeriods = currentYearPeriods();
+  const clearFilters = () => setFilters({ periods: defaultPeriods, membro: "", unidade: "", tipoCateter: "" });
+  const hasFilters = !samePeriods(filters.periods, defaultPeriods) || filters.membro !== "" || filters.unidade !== "" || filters.tipoCateter !== "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -49,6 +48,7 @@ export default function Flebite() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Atualiza a cada 5 min</span>
+            <ThemeToggle />
             <button onClick={refetch} disabled={loading} className="p-1.5 rounded-md hover:bg-secondary transition-colors disabled:opacity-50" title="Recarregar">
               <RefreshCw size={14} className={`text-muted-foreground ${loading ? "animate-spin" : ""}`} />
             </button>
@@ -70,18 +70,8 @@ export default function Flebite() {
                 <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Filtros</span>
               </div>
 
-              <div className="flex-1 min-w-[115px] relative">
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => startRef.current?.showPicker()}>
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input ref={startRef} type="date" min={`${new Date().getFullYear()}-01-01`} max={new Date().toISOString().split("T")[0]} value={filters.dateStart} onChange={(e) => update("dateStart", e.target.value)} className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`} />
-              </div>
-              <span className="text-muted-foreground text-xs text-center flex-shrink-0">até</span>
-              <div className="flex-1 min-w-[115px] relative">
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => endRef.current?.showPicker()}>
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input ref={endRef} type="date" min="2024-01-01" max={new Date().toISOString().split("T")[0]} value={filters.dateEnd} onChange={(e) => update("dateEnd", e.target.value)} className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`} />
+              <div className="flex-1 min-w-[180px]">
+                <PeriodFilter years={options.anos} value={filters.periods} onChange={(periods) => setFilters({ ...filters, periods })} />
               </div>
 
               <div className="flex-1 min-w-[140px]">

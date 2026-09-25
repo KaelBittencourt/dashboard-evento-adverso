@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface KpiCardProps {
   title: string;
@@ -15,31 +16,31 @@ interface KpiCardProps {
 
 const variantConfig = {
   default: {
-    accent: "hsl(215, 15%, 52%)",
-    accentMuted: "hsl(215, 15%, 52%, 0.12)",
-    valueColor: "text-foreground",
+    bar: "bg-muted-foreground/40",
+    wash: "bg-muted",
   },
   primary: {
-    accent: "hsl(199, 89%, 48%)",
-    accentMuted: "hsl(199, 89%, 48%, 0.12)",
-    valueColor: "text-foreground",
+    bar: "bg-primary",
+    wash: "bg-primary/10",
   },
   danger: {
-    accent: "hsl(0, 72%, 55%)",
-    accentMuted: "hsl(0, 72%, 55%, 0.12)",
-    valueColor: "text-foreground",
+    bar: "bg-destructive",
+    wash: "bg-destructive/10",
   },
   warning: {
-    accent: "hsl(25, 95%, 53%)",
-    accentMuted: "hsl(25, 95%, 53%, 0.12)",
-    valueColor: "text-foreground",
+    bar: "bg-severity-moderate",
+    wash: "bg-severity-moderate/10",
   },
   success: {
-    accent: "hsl(142, 71%, 45%)",
-    accentMuted: "hsl(142, 71%, 45%, 0.12)",
-    valueColor: "text-foreground",
+    bar: "bg-severity-none",
+    wash: "bg-severity-none/10",
   },
 };
+
+function isNumericDisplay(value: string | number) {
+  if (typeof value === "number") return true;
+  return /^-?[\d.,]+%?$/.test(String(value).trim());
+}
 
 export function KpiCard({
   title,
@@ -56,74 +57,68 @@ export function KpiCard({
   const isUp = trendNum !== null && trendNum > 0;
   const isDown = trendNum !== null && trendNum < 0;
   const config = variantConfig[variant];
+  const numeric = isNumericDisplay(value);
 
   return (
-    <div className="group relative h-full flex flex-col justify-between rounded-xl bg-card/60 border border-border/40 overflow-hidden transition-all duration-300 hover:border-border/80 hover:bg-card/80">
-      {/* Top accent line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[2px] opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: `linear-gradient(90deg, transparent, ${config.accent}, transparent)` }}
-      />
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_1px_2px_hsl(220_20%_10%/0.05)] transition-shadow duration-200 hover:shadow-[0_10px_24px_-16px_hsl(220_20%_10%/0.28)]">
+      <div className={cn("absolute inset-y-3 left-0 w-[3px] rounded-r-full", config.bar)} />
 
-      <div className="px-4 py-3.5 flex flex-col flex-1">
-        {/* Header: icon + title */}
-        <div className="flex items-center gap-2 mb-2.5">
-          <div
-            className="flex items-center justify-center w-6 h-6 rounded-md transition-transform duration-300 group-hover:scale-110"
-            style={{ backgroundColor: config.accentMuted }}
-          >
-            <span className="[&>svg]:w-3.5 [&>svg]:h-3.5">{icon}</span>
-          </div>
-          <span className="text-[10.5px] font-semibold text-foreground/80 uppercase tracking-widest truncate">
+      <div className="flex h-full flex-col px-4 py-3.5 pl-5">
+        <div className="flex items-start justify-between gap-3">
+          <p className="pt-1 text-[11px] font-medium leading-snug text-muted-foreground line-clamp-2">
             {title}
-          </span>
+          </p>
+          <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", config.wash)}>
+            <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+          </div>
         </div>
 
-        {/* Value row */}
-        <div className="flex items-baseline gap-2">
+        <div className="mt-2.5 min-w-0">
           <span
-            className={`font-bold tracking-tight ${
-              mono ? "font-mono" : ""
-            } ${config.valueColor} ${valueClassName || "text-[1.35rem] leading-none truncate"}`}
+            className={cn(
+              "block min-w-0 text-foreground",
+              valueClassName ||
+                (numeric
+                  ? "text-[1.75rem] font-semibold leading-none tracking-tight tabular-nums"
+                  : "text-[15px] font-semibold leading-snug line-clamp-2"),
+              mono && numeric && "font-mono",
+            )}
             title={typeof value === "string" ? value : undefined}
           >
             {value}
           </span>
-
-          {trendNum !== null && (
-            <span
-              className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-[2px] rounded-md shrink-0 ${
-                isUp
-                  ? "text-red-400 bg-red-400/10"
-                  : isDown
-                  ? "text-emerald-400 bg-emerald-400/10"
-                  : "text-muted-foreground bg-muted/50"
-              }`}
-            >
-              {isUp ? (
-                <TrendingUp size={9} strokeWidth={2.5} />
-              ) : isDown ? (
-                <TrendingDown size={9} strokeWidth={2.5} />
-              ) : (
-                <Minus size={9} strokeWidth={2.5} />
-              )}
-              {isUp ? "+" : ""}
-              {trend}%
-            </span>
-          )}
         </div>
 
-        {/* Subtitle / Spacer */}
-        <div className="mt-auto pt-1.5">
-          {(subtitle || trendLabel) ? (
-            <p className="text-[10.5px] font-medium text-muted-foreground leading-tight truncate">
-              {subtitle}
+        <div className="mt-auto pt-2.5">
+          {trendNum !== null && (
+            <div className="flex items-center gap-1.5">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums",
+                  isUp && "bg-red-500/10 text-red-700 dark:text-red-400",
+                  isDown && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+                  !isUp && !isDown && "bg-muted text-muted-foreground",
+                )}
+              >
+                {isUp ? (
+                  <TrendingUp size={11} strokeWidth={2.5} />
+                ) : isDown ? (
+                  <TrendingDown size={11} strokeWidth={2.5} />
+                ) : (
+                  <Minus size={11} strokeWidth={2.5} />
+                )}
+                {isUp ? "+" : ""}
+                {trend}%
+              </span>
               {trendLabel && (
-                <span className="text-muted-foreground/80"> · {trendLabel}</span>
+                <span className="truncate text-[11px] text-muted-foreground">{trendLabel}</span>
               )}
+            </div>
+          )}
+          {subtitle && (
+            <p className={cn("text-[11px] leading-snug text-muted-foreground line-clamp-2", trendNum !== null && "mt-1")}>
+              {subtitle}
             </p>
-          ) : (
-            <div className="h-[12px] w-full" /> /* Preserves spacing for empty subtitle */
           )}
         </div>
       </div>

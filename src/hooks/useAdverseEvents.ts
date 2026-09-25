@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { collectYears, currentYearPeriods, matchesPeriod } from "@/lib/periodFilter";
 
 export interface AdverseEvent {
   dataInternacao: string;
@@ -29,8 +30,7 @@ export interface AdverseEvent {
 }
 
 export interface Filters {
-  dateStart: string;
-  dateEnd: string;
+  periods: string[];
   tipoEvento: string;
   unidade: string;
   danos: string;
@@ -131,8 +131,7 @@ export function useAdverseEvents() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<Filters>({
-    dateStart: `${new Date().getFullYear()}-01-01`,
-    dateEnd: "",
+    periods: currentYearPeriods(),
     tipoEvento: "",
     unidade: "",
     danos: "",
@@ -169,15 +168,7 @@ export function useAdverseEvents() {
       if (filters.unidade && e.unidade !== filters.unidade) return false;
       if (filters.danos && e.danos !== filters.danos) return false;
       if (filters.turno && e.turno !== filters.turno) return false;
-      if (filters.dateStart && e.dataEvento) {
-        const start = new Date(filters.dateStart);
-        if (e.dataEvento < start) return false;
-      }
-      if (filters.dateEnd && e.dataEvento) {
-        const end = new Date(filters.dateEnd);
-        end.setHours(23, 59, 59);
-        if (e.dataEvento > end) return false;
-      }
+      if (!matchesPeriod(e.dataEvento, filters.periods)) return false;
       return true;
     });
   }, [events, filters]);
@@ -188,6 +179,7 @@ export function useAdverseEvents() {
     unidades: [...new Set(events.map((e) => e.unidade).filter(Boolean))].sort(),
     danos: ["Nenhum", "Leve", "Moderado", "Severo", "Morte"],
     turnos: ["Manhã", "Tarde", "Noite"],
+    anos: collectYears(events.map((e) => e.dataEvento)),
   }), [events]);
 
   return {

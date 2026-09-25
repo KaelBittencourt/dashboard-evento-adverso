@@ -1,7 +1,9 @@
 import { Filters } from "@/hooks/useAdverseEvents";
-import { RefreshCw, Filter, Calendar, Plus } from "lucide-react";
-import { useRef } from "react";
+import { currentYearPeriods, samePeriods } from "@/lib/periodFilter";
+import { RefreshCw, Filter, Plus } from "lucide-react";
 import { DashboardSwitcher } from "./DashboardSwitcher";
+import { PeriodFilter } from "./PeriodFilter";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface DashboardHeaderProps {
   filters: Filters;
@@ -11,14 +13,12 @@ interface DashboardHeaderProps {
     unidades: string[];
     danos: string[];
     turnos: string[];
+    anos: number[];
   };
   lastUpdated: Date | null;
   onRefresh: () => void;
   loading: boolean;
 }
-
-const inputClass =
-  "bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 w-full placeholder:text-muted-foreground/40";
 
 const selectClass =
   "filter-select bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 pr-7 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 appearance-none cursor-pointer w-full truncate";
@@ -31,18 +31,15 @@ export function DashboardHeader({
   onRefresh,
   loading,
 }: DashboardHeaderProps) {
-  const startRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLInputElement>(null);
-
-  const update = (key: keyof Filters, value: string) =>
+  const update = (key: Exclude<keyof Filters, "periods">, value: string) =>
     setFilters({ ...filters, [key]: value });
 
+  const defaultPeriods = currentYearPeriods();
   const clearFilters = () =>
-    setFilters({ dateStart: `${new Date().getFullYear()}-01-01`, dateEnd: "", tipoEvento: "", unidade: "", danos: "", turno: "" });
+    setFilters({ periods: defaultPeriods, tipoEvento: "", unidade: "", danos: "", turno: "" });
 
   const hasFilters =
-    filters.dateStart !== `${new Date().getFullYear()}-01-01` ||
-    filters.dateEnd !== "" ||
+    !samePeriods(filters.periods, defaultPeriods) ||
     filters.tipoEvento !== "" ||
     filters.unidade !== "" ||
     filters.danos !== "" ||
@@ -62,6 +59,7 @@ export function DashboardHeader({
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Atualiza a cada 5 min</span>
+          <ThemeToggle />
           <button
             onClick={onRefresh}
             disabled={loading}
@@ -99,45 +97,11 @@ export function DashboardHeader({
               <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Filtros</span>
             </div>
 
-            <div className="flex-1 min-w-[115px] relative">
-              <div
-                className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 flex items-center justify-center p-1"
-                onClick={() => startRef.current?.showPicker()}
-                title="Abrir calendário"
-              >
-                <Calendar size={13} strokeWidth={2.5} />
-              </div>
-              <input
-                ref={startRef}
-                type="date"
-                min={`${new Date().getFullYear()}-01-01`}
-                max={new Date().toISOString().split("T")[0]}
-                value={filters.dateStart}
-                onChange={(e) => update("dateStart", e.target.value)}
-                className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
-                title="Data início"
-                placeholder="dd/mm/aaaa"
-              />
-            </div>
-            <span className="text-muted-foreground text-xs text-center flex-shrink-0">até</span>
-            <div className="flex-1 min-w-[115px] relative">
-              <div
-                className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 flex items-center justify-center p-1"
-                onClick={() => endRef.current?.showPicker()}
-                title="Abrir calendário"
-              >
-                <Calendar size={13} strokeWidth={2.5} />
-              </div>
-              <input
-                ref={endRef}
-                type="date"
-                min={`${new Date().getFullYear()}-01-01`}
-                max={new Date().toISOString().split("T")[0]}
-                value={filters.dateEnd}
-                onChange={(e) => update("dateEnd", e.target.value)}
-                className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
-                title="Data fim"
-                placeholder="dd/mm/aaaa"
+            <div className="flex-1 min-w-[180px]">
+              <PeriodFilter
+                years={options.anos}
+                value={filters.periods}
+                onChange={(periods) => setFilters({ ...filters, periods })}
               />
             </div>
 

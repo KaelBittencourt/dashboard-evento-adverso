@@ -3,6 +3,7 @@ import {
 } from "recharts";
 import { useState } from "react";
 import { PhlebitisEvent } from "@/hooks/useFlebite";
+import { useHeatmapColor } from "@/lib/heatmapColor";
 import { Download, Users, Syringe, Sparkles, AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -26,7 +27,7 @@ const PALETTE = [
   COLORS.danger, COLORS.purple, COLORS.success, COLORS.pink,
 ];
 
-const axisStyle = { fill: "hsl(215, 15%, 52%)", fontSize: 11 };
+const axisStyle = { fill: "hsl(var(--muted-foreground))", fontSize: 11 };
 
 function ChartCard({ title, subtitle, children, className = "" }: { title: string; subtitle?: string; children: React.ReactNode; className?: string }) {
   return (
@@ -305,16 +306,13 @@ export function PhlebitisWeekdayChart({ data }: { data: { day: string; count: nu
 /* ──────── 8. Heatmap ──────── */
 
 export function PhlebitisHeatmapChart({ data }: { data: { day: string; hour: number; value: number }[] }) {
+  const cellColor = useHeatmapColor();
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   const maxVal = Math.max(...data.map((d) => d.value), 1);
   const matrix: Record<string, number[]> = {};
   days.forEach((d) => { matrix[d] = new Array(24).fill(0); });
   data.forEach((d) => { if (matrix[d.day]) matrix[d.day][d.hour] = d.value; });
-  const getColor = (val: number) => {
-    if (val === 0) return "hsl(220, 14%, 14%)";
-    const t = val / maxVal;
-    return `hsl(${199 - t * 10}, ${50 + t * 40}%, ${18 + t * 38}%)`;
-  };
+  const getColor = (val: number) => cellColor(val, maxVal);
   return (
     <ChartCard title="Heatmap de Notificações" subtitle="Densidade por dia × horário" className="lg:col-span-2 flex flex-col">
       <div className="flex-1 w-full flex flex-col justify-center min-h-[220px] md:min-h-[260px] overflow-x-auto custom-scrollbar">
@@ -350,12 +348,12 @@ export function PhlebitisHeatmapChart({ data }: { data: { day: string; hour: num
 /* ──────── 9. Tabela de registros com modal ──────── */
 
 const SINAL_BADGE_COLORS: Record<string, string> = {
-  "Rubor/Hiperemia": "bg-red-500/10 text-red-400 border-red-500/20",
-  "Edema/Infiltração": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  "Dor": "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  "Calor": "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  "Secreção": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  "Endurecimento": "bg-teal-500/10 text-teal-400 border-teal-500/20",
+  "Rubor/Hiperemia": "bg-red-500/10 text-red-700 border-red-500/20 dark:text-red-400",
+  "Edema/Infiltração": "bg-blue-500/10 text-blue-700 border-blue-500/20 dark:text-blue-400",
+  "Dor": "bg-orange-500/10 text-orange-700 border-orange-500/20 dark:text-orange-400",
+  "Calor": "bg-amber-500/10 text-amber-700 border-amber-500/20 dark:text-amber-400",
+  "Secreção": "bg-purple-500/10 text-purple-700 border-purple-500/20 dark:text-purple-400",
+  "Endurecimento": "bg-teal-500/10 text-teal-700 border-teal-500/20 dark:text-teal-400",
 };
 
 export function PhlebitisDataTable({ events }: { events: PhlebitisEvent[] }) {

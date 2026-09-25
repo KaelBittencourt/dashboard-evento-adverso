@@ -1,4 +1,5 @@
 import { MedErrorEvent } from "@/hooks/useFalhasMedicacao";
+import { useHeatmapColor } from "@/lib/heatmapColor";
 import {
   Sparkles, Download, Table2, AlertTriangle, CheckCircle2, AlertCircle,
 } from "lucide-react";
@@ -29,7 +30,7 @@ const PALETTE = [
   COLORS.teal, COLORS.amber, COLORS.pink, COLORS.success,
 ];
 
-const axisStyle = { fill: "hsl(215, 15%, 52%)", fontSize: 11 };
+const axisStyle = { fill: "hsl(var(--muted-foreground))", fontSize: 11 };
 
 /* ═══════════════════════════════════════════════════════
    CHART CARD WRAPPER
@@ -431,17 +432,14 @@ export function MedErrorWeekdayChart({ data }: { data: { day: string; count: num
    ═══════════════════════════════════════════════════════ */
 
 export function MedErrorHeatmapChart({ data }: { data: { day: string; hour: number; value: number }[] }) {
+  const cellColor = useHeatmapColor();
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   const maxVal = Math.max(...data.map((d) => d.value), 1);
   const matrix: Record<string, number[]> = {};
   days.forEach((d) => { matrix[d] = new Array(24).fill(0); });
   data.forEach((d) => { if (matrix[d.day]) matrix[d.day][d.hour] = d.value; });
 
-  const getColor = (val: number) => {
-    if (val === 0) return "hsl(220, 14%, 14%)";
-    const t = val / maxVal;
-    return `hsl(${199 - t * 10}, ${50 + t * 40}%, ${18 + t * 38}%)`;
-  };
+  const getColor = (val: number) => cellColor(val, maxVal);
 
   return (
     <ChartCard title="Heatmap de Notificações" subtitle="Densidade por dia × horário" className="lg:col-span-2 flex flex-col">

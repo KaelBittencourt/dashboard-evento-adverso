@@ -22,6 +22,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from "recharts";
+import { useHeatmapColor } from "@/lib/heatmapColor";
 
 const CHART_COLORS = [
   "hsl(199, 89%, 48%)",
@@ -42,16 +43,8 @@ const DAMAGE_COLORS: Record<string, string> = {
   Morte: "hsl(280, 65%, 50%)",
 };
 
-const tooltipStyle = {
-  backgroundColor: "hsl(220, 18%, 11%)",
-  border: "1px solid hsl(220, 14%, 18%)",
-  borderRadius: "8px",
-  color: "hsl(210, 20%, 92%)",
-  fontSize: "12px",
-};
-
 const axisStyle = {
-  fill: "hsl(215, 15%, 52%)",
+  fill: "hsl(var(--muted-foreground))",
   fontSize: 11,
 };
 
@@ -493,6 +486,7 @@ interface HeatmapData {
 }
 
 export function HeatmapChart({ data }: { data: HeatmapData[] }) {
+  const cellColor = useHeatmapColor();
   const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   const maxVal = Math.max(...data.map((d) => d.value), 1);
 
@@ -505,15 +499,7 @@ export function HeatmapChart({ data }: { data: HeatmapData[] }) {
   });
 
   // Paleta monocromática ciano — do sutil ao vibrante
-  const getColor = (val: number) => {
-    if (val === 0) return "hsl(220, 14%, 14%)";
-    const t = val / maxVal;
-    // Interpolação suave: azul escuro → ciano → ciano brilhante
-    const h = 199 - t * 10;        // 199 → 189
-    const s = 50 + t * 40;         // 50% → 90%
-    const l = 18 + t * 38;         // 18% → 56%
-    return `hsl(${h}, ${s}%, ${l}%)`;
-  };
+  const getColor = (val: number) => cellColor(val, maxVal);
 
   return (
     <ChartCard

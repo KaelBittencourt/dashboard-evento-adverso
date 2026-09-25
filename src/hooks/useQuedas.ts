@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { collectYears, matchesPeriod } from "@/lib/periodFilter";
 
 export interface FallEvent {
   timestamp: Date | null;
@@ -17,8 +18,7 @@ export interface FallEvent {
 }
 
 export interface FallFilters {
-  dateStart: string;
-  dateEnd: string;
+  periods: string[];
   localQueda: string;
   unidade: string;
   dano: string;         // "all" | "sim" | "nao"
@@ -141,8 +141,7 @@ export function useQuedas() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<FallFilters>({
-    dateStart: "",
-    dateEnd: "",
+    periods: [],
     localQueda: "",
     unidade: "",
     dano: "all",
@@ -191,15 +190,7 @@ export function useQuedas() {
         const a = e.acompanhante.toLowerCase();
         if (a === "sim") return false;
       }
-      if (filters.dateStart && e.dataQueda) {
-        const start = new Date(filters.dateStart);
-        if (e.dataQueda < start) return false;
-      }
-      if (filters.dateEnd && e.dataQueda) {
-        const end = new Date(filters.dateEnd);
-        end.setHours(23, 59, 59);
-        if (e.dataQueda > end) return false;
-      }
+      if (!matchesPeriod(e.dataQueda, filters.periods)) return false;
       return true;
     });
   }, [events, filters]);
@@ -207,6 +198,7 @@ export function useQuedas() {
   const options = useMemo(() => ({
     locais: [...new Set(events.map((e) => e.localQueda).filter(Boolean))].sort(),
     unidades: [...new Set(events.map((e) => e.unidade).filter(Boolean))].sort(),
+    anos: collectYears(events.map((e) => e.dataQueda)),
   }), [events]);
 
   return {

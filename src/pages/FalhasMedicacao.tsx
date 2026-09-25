@@ -11,18 +11,17 @@ import {
   MedErrorHeatmapChart, MedErrorDataTable, MedErrorInsightsPanel,
 } from "@/components/dashboard/MedErrorCharts";
 import { DashboardSwitcher } from "@/components/dashboard/DashboardSwitcher";
+import { PeriodFilter } from "@/components/dashboard/PeriodFilter";
+import { ThemeToggle } from "@/components/dashboard/ThemeToggle";
 import {
-  RefreshCw, Filter, Calendar, Plus, AlertTriangle, CalendarDays,
+  RefreshCw, Filter, Plus, AlertTriangle, CalendarDays,
   Pill, BarChart2, ShieldX, TrendingUp,
 } from "lucide-react";
-import { useRef, useMemo } from "react";
+import { useMemo } from "react";
 
 /* ═══════════════════════════════════════════════════════
    CLASSES DE ESTILO
    ═══════════════════════════════════════════════════════ */
-
-const inputClass =
-  "bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 w-full placeholder:text-muted-foreground/40";
 
 const selectClass =
   "filter-select bg-card/80 hover:bg-card border border-border/50 text-foreground text-[11px] rounded-lg px-3 py-2 pr-7 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/40 transition-all duration-200 appearance-none cursor-pointer w-full truncate";
@@ -37,9 +36,6 @@ export default function FalhasMedicacao() {
     lastUpdated, filters, setFilters, options, refetch,
   } = useFalhasMedicacao();
 
-  const startRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLInputElement>(null);
-
   /* ── Analytics (memoizados) ── */
   const kpis = useMemo(() => getMedErrorKPIs(filteredEvents), [filteredEvents]);
   const evolutionData = useMemo(() => getMedErrorEvolution(filteredEvents), [filteredEvents]);
@@ -52,14 +48,14 @@ export default function FalhasMedicacao() {
   const insights = useMemo(() => generateMedErrorInsights(filteredEvents), [filteredEvents]);
 
   /* ── Filtros helpers ── */
-  const update = (key: keyof MedErrorFilters, value: string) =>
+  const update = (key: Exclude<keyof MedErrorFilters, "periods">, value: string) =>
     setFilters({ ...filters, [key]: value });
 
   const clearFilters = () =>
-    setFilters({ dateStart: "", dateEnd: "", tipoFalha: "", via: "", medicamento: "" });
+    setFilters({ periods: [], tipoFalha: "", via: "", medicamento: "" });
 
   const hasFilters =
-    filters.dateStart !== "" || filters.dateEnd !== "" ||
+    filters.periods.length > 0 ||
     filters.tipoFalha !== "" || filters.via !== "" || filters.medicamento !== "";
 
   /* ═══════════ RENDER ═══════════ */
@@ -80,6 +76,7 @@ export default function FalhasMedicacao() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Atualiza a cada 5 min</span>
+            <ThemeToggle />
             <button
               onClick={refetch}
               disabled={loading}
@@ -113,36 +110,11 @@ export default function FalhasMedicacao() {
                 <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Filtros</span>
               </div>
 
-              {/* Data início */}
-              <div className="flex-shrink-0 w-[135px] sm:w-[145px] relative">
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => startRef.current?.showPicker()}>
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input
-                  ref={startRef}
-                  type="date"
-                  min="2024-01-01"
-                  max={new Date().toISOString().split("T")[0]}
-                  value={filters.dateStart}
-                  onChange={(e) => update("dateStart", e.target.value)}
-                  className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
-                />
-              </div>
-              <span className="text-muted-foreground text-xs text-center flex-shrink-0">até</span>
-
-              {/* Data fim */}
-              <div className="flex-shrink-0 w-[135px] sm:w-[145px] relative">
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer text-white hover:text-white/80 transition-colors z-10 p-1" onClick={() => endRef.current?.showPicker()}>
-                  <Calendar size={13} strokeWidth={2.5} />
-                </div>
-                <input
-                  ref={endRef}
-                  type="date"
-                  min="2024-01-01"
-                  max={new Date().toISOString().split("T")[0]}
-                  value={filters.dateEnd}
-                  onChange={(e) => update("dateEnd", e.target.value)}
-                  className={`${inputClass} pl-8 [&::-webkit-calendar-picker-indicator]:hidden`}
+              <div className="flex-shrink-0 w-[180px] sm:w-[210px]">
+                <PeriodFilter
+                  years={options.anos}
+                  value={filters.periods}
+                  onChange={(periods) => setFilters({ ...filters, periods })}
                 />
               </div>
 

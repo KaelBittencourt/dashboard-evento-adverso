@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { collectYears, matchesPeriod } from "@/lib/periodFilter";
 
 /* ═══════════════════════════════════════════════════════
    TIPOS
@@ -17,8 +18,7 @@ export interface MedErrorEvent {
 }
 
 export interface MedErrorFilters {
-  dateStart: string;
-  dateEnd: string;
+  periods: string[];
   tipoFalha: string;
   via: string;
   medicamento: string;
@@ -262,8 +262,7 @@ export function useFalhasMedicacao() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<MedErrorFilters>({
-    dateStart: "",
-    dateEnd: "",
+    periods: [],
     tipoFalha: "",
     via: "",
     medicamento: "",
@@ -305,14 +304,7 @@ export function useFalhasMedicacao() {
       if (filters.tipoFalha && e.tipoFalha !== filters.tipoFalha) return false;
       if (filters.via && e.via !== filters.via) return false;
       if (filters.medicamento && e.medicamento !== filters.medicamento) return false;
-      if (filters.dateStart && e.timestamp) {
-        if (e.timestamp < new Date(filters.dateStart)) return false;
-      }
-      if (filters.dateEnd && e.timestamp) {
-        const end = new Date(filters.dateEnd);
-        end.setHours(23, 59, 59);
-        if (e.timestamp > end) return false;
-      }
+      if (!matchesPeriod(e.timestamp, filters.periods)) return false;
       return true;
     });
   }, [events, filters]);
@@ -322,6 +314,7 @@ export function useFalhasMedicacao() {
     tiposFalha: [...new Set(events.map((e) => e.tipoFalha).filter(Boolean))].sort(),
     vias: [...new Set(events.map((e) => e.via).filter(Boolean))].sort(),
     medicamentos: [...new Set(events.map((e) => e.medicamento).filter(Boolean))].sort(),
+    anos: collectYears(events.map((e) => e.timestamp)),
   }), [events]);
 
   return {

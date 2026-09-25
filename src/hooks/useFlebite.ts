@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { collectYears, currentYearPeriods, matchesPeriod } from "@/lib/periodFilter";
 
 export interface PhlebitisEvent {
   timestamp: Date | null;
@@ -16,8 +17,7 @@ export interface PhlebitisEvent {
 }
 
 export interface PhlebitisFilters {
-  dateStart: string;
-  dateEnd: string;
+  periods: string[];
   membro: string;
   unidade: string;
   tipoCateter: string;
@@ -159,8 +159,7 @@ export function useFlebite() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [filters, setFilters] = useState<PhlebitisFilters>({
-    dateStart: `${new Date().getFullYear()}-01-01`,
-    dateEnd: "",
+    periods: currentYearPeriods(),
     membro: "",
     unidade: "",
     tipoCateter: "",
@@ -195,14 +194,7 @@ export function useFlebite() {
       if (filters.membro && e.membroCateter !== filters.membro) return false;
       if (filters.unidade && e.unidade !== filters.unidade) return false;
       if (filters.tipoCateter && e.tipoCateter !== filters.tipoCateter) return false;
-      if (filters.dateStart && e.timestamp) {
-        if (e.timestamp < new Date(filters.dateStart)) return false;
-      }
-      if (filters.dateEnd && e.timestamp) {
-        const end = new Date(filters.dateEnd);
-        end.setHours(23, 59, 59);
-        if (e.timestamp > end) return false;
-      }
+      if (!matchesPeriod(e.timestamp, filters.periods)) return false;
       return true;
     });
   }, [events, filters]);
@@ -211,6 +203,7 @@ export function useFlebite() {
     membros: [...new Set(events.map((e) => e.membroCateter).filter(Boolean))].sort(),
     unidades: [...new Set(events.map((e) => e.unidade).filter(Boolean))].sort(),
     tipos: [...new Set(events.map((e) => e.tipoCateter).filter(Boolean))].sort(),
+    anos: collectYears(events.map((e) => e.timestamp)),
   }), [events]);
 
   return { events, filteredEvents, loading, error, lastUpdated, filters, setFilters, options, refetch: fetchData };
